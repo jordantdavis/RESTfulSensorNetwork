@@ -2,6 +2,9 @@
 
     include("lib/php/slim/vendor/autoload.php");
     include("model/jsonRequestValidation.php");
+    
+    //connect to database, need to put your mysql info
+    $con=mysqli_connect("localhost","COMP4302jdavis17","password", "COMP4302jdavis17");
 
     $app = new Slim\Slim();
 
@@ -18,7 +21,8 @@
             $ipAddr = $request->getIp();
 
             // store in database
-
+            mysqli_query($con, "INSERT INTO Devices (id, ipAddr) VALUES ('$uuid','$ipAddr')");
+           
             // response body
             $response->setStatus(200);
             $response->headers->set("Content-Type", "application/json");
@@ -38,8 +42,10 @@
         if (Model\validateConnectRequestJson($requestBody)) {
             $uuid = $requestBody["uuid"];
             $ipAddr = $request->getIp();
-
+			
             // change ipAddr and connection status in database
+            mysqli_query($con,"UPDATE Devices SET idAddr = '$ipAddr' WHERE id='$uuid'");
+            mysqli_query($con,"UPDATE Devices SET connected = 'True' WHERE id='$uuid'");
 
             // response body
             $response->setStatus(200);
@@ -61,6 +67,7 @@
             $ipAddr = $request->getIp();
 
             // change ipAddr in database
+            mysqli_query($con,"UPDATE Devices SET idAddr = '$ipAddr' WHERE id='$uuid'");
 
             // response body
             $response->setStatus(200);
@@ -81,7 +88,8 @@
             $uuid = $requestBody["uuid"];
 
             // change connection status in database
-
+            mysqli_query($con,"UPDATE Devices SET connected = 'False' WHERE id='$uuid'");
+			
             // response body
             $response->setStatus(200);
             $response->headers->set("Content-Type", "application/json");
@@ -89,7 +97,9 @@
 
         }
     });
-
+	
     $app->run();
-
+	
+	//close database connection
+	mysqli_close($con);
 ?>
