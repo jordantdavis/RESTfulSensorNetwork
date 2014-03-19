@@ -1,81 +1,93 @@
 <?php
 
     include("lib/php/slim/vendor/autoload.php");
+    include("model/jsonRequestValidation.php");
 
     $app = new Slim\Slim();
 
-    /*
-        /connect input format:
-        {
-            sensors: {
-                environmental: [...],
-                position: [...],
-                motion: [...]
-            }
-        }
+    // register a new device
+    $app->post("/register", function() {
+        $request = Slim\Slim::getInstance()->request;
+        $requestBody = json_decode($request->getBody(), true);
+        $response = Slim\Slim::getInstance()->response;
 
-        /update or /disconnect input format:
-        {
-            uuid: ...
+        // validate json input
+        if (Model\validateRegisterRequestJson($requestBody)) {
+            // values for database
+            $uuid = uniqid($more_entropy=true);
+            $ipAddr = $request->getIp();
+
+            // store in database
+
+            // response body
+            $response->setStatus(200);
+            $response->headers->set("Content-Type", "application/json");
+            $response->setBody(json_encode(array("uuid" => $uuid)));
+        } else {
+            echo json_encode(array("message" => "Bad request"));
         }
-    */
+    });
 
     // connect a device
     $app->post("/connect", function() {
-        $req = Slim\Slim::getInstance()->request;
-        $reqBody = json_decode($req->getBody(), true);
+        $request = Slim\Slim::getInstance()->request;
+        $requestBody = json_decode($request->getBody(), true);
+        $response = Slim\Slim::getInstance()->response;
 
         // validate json input
-        // if ($reqBody) {
-        //     if (array_key_exists("sensors", $reqBody) && count($reqBody) == 1) {
-        //         $allSensors = $reqBody["sensors"];
-        //
-        //         if (is_array($allSensors)) {
-        //
-        //         } else {
-        //
-        //         }
-        //     } else {
-        //
-        //     }
-        // } else {
-        //
-        // }
+        if (Model\validateConnectRequestJson($requestBody)) {
+            $uuid = $requestBody["uuid"];
+            $ipAddr = $request->getIp();
 
-        // values for database
-        $uuid = uniqid($more_entropy=true);
-        $ipAddr = $req->getIp();
+            // change ipAddr and connection status in database
 
-        // store in database
+            // response body
+            $response->setStatus(200);
+            $response->headers->set("Content-Type", "application/json");
+        } else {
 
-        // response body
-        echo json_encode(array("uuid" => $uuid));
+        }
     });
 
     // update a device's address
     $app->post("/update", function() {
-        $req = Slim\Slim::getInstance()->request;
-        $reqBody = json_decode($req->getBody(), true);
+        $request = Slim\Slim::getInstance()->request;
+        $requestBody = json_decode($request->getBody(), true);
+        $response = Slim\Slim::getInstance()->response;
 
         // validate json input
+        if (Model\validateUpdateRequestJson($requestBody)) {
+            $uuid = $requestBody["uuid"];
+            $ipAddr = $request->getIp();
 
-        // change ipAddr in Device table
+            // change ipAddr in database
 
-        // response body
-        echo "{}";
+            // response body
+            $response->setStatus(200);
+            $response->headers->set("Content-Type", "application/json");
+        } else {
+
+        }
     });
 
     // gracefully disconnect a device
     $app->post("/disconnect", function() {
-        $req = Slim\Slim::getInstance()->request;
-        $reqBody = json_decode($req->getBody(), true);
+        $request = Slim\Slim::getInstance()->request;
+        $requestBody = json_decode($request->getBody(), true);
+        $response = Slim\Slim::getInstance()->response;
 
         // validate json input
+        if (Model\validateDisconnectRequestJson($requestBody)) {
+            $uuid = $requestBody["uuid"];
 
-        // change connection status of uuid to false
+            // change connection status in database
 
-        // response body
-        echo "{}";
+            // response body
+            $response->setStatus(200);
+            $response->headers->set("Content-Type", "application/json");
+        } else {
+
+        }
     });
 
     $app->run();

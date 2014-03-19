@@ -10,23 +10,22 @@ CREATE TABLE EnvironmentalSensors (
     humidity BOOLEAN NOT NULL,
     light BOOLEAN NOT NULL,
     pressure BOOLEAN NOT NULL,
-    temp BOOLEAN NOT NULL,
+    temperature BOOLEAN NOT NULL,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE MotionSensors (
+    id CHAR(32) NOT NULL,
+    accelerometer BOOLEAN NOT NULL,
+    gravity BOOLEAN NOT NULL,
+    gyroscope BOOLEAN NOT NULL,
     PRIMARY KEY(id)
 );
 
 CREATE TABLE PositionSensors (
     id CHAR(32) NOT NULL,
     gps BOOLEAN NOT NULL,
-    magnetic BOOLEAN NOT NULL,
-    orientation BOOLEAN NOT NULL,
+    magnetometer BOOLEAN NOT NULL,
     proximity BOOLEAN NOT NULL,
-    PRIMARY KEY(id)
-);
-
-CREATE TABLE MotionSensors (
-    id CHAR(32) NOT NULL,
-    accel BOOLEAN NOT NULL,
-    grav BOOLEAN NOT NULL,
-    gyro BOOLEAN NOT NULL,
     PRIMARY KEY(id)
 );
