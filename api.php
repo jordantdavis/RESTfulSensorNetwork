@@ -44,7 +44,7 @@
             $ipAddr = $request->getIp();
 			
             // change ipAddr and connection status in database
-            mysqli_query($con,"UPDATE Devices SET idAddr = '$ipAddr' WHERE id='$uuid'");
+            mysqli_query($con,"UPDATE Devices SET ipAddr = '$ipAddr' WHERE id='$uuid'");
             mysqli_query($con,"UPDATE Devices SET connected = 'True' WHERE id='$uuid'");
 
             // response body
@@ -67,7 +67,7 @@
             $ipAddr = $request->getIp();
 
             // change ipAddr in database
-            mysqli_query($con,"UPDATE Devices SET idAddr = '$ipAddr' WHERE id='$uuid'");
+            mysqli_query($con,"UPDATE Devices SET ipAddr = '$ipAddr' WHERE id='$uuid'");
 
             // response body
             $response->setStatus(200);
