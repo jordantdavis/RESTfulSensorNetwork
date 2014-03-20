@@ -1,6 +1,7 @@
 CREATE TABLE Devices (
     id CHAR(32) NOT NULL,
-    ipAddr CHAR(15) NOT NULL,
+    addr CHAR(15) NOT NULL,
+    port CHAR(5) NOT NULL,
     connected BOOLEAN NOT NULL,
     PRIMARY KEY(id)
 );
