@@ -3,9 +3,9 @@
     namespace Model;
 
     define("HOST", "127.0.0.1");
-    define("USER", "root");
-    define("PASS", "password");
-    define("DB", "RSN");
+    define("USER", "COMP4302jdavis17");
+    define("PASS", "YTM4NTM4YWNmYzA4Y2Nm");
+    define("DB", "COMP4302jdavis17");
 
     function insertNewDevice($uuid, $addr, $port) {
         $cxn = new \mysqli(HOST, USER, PASS, DB);
@@ -25,22 +25,9 @@
         return true;
     }
 
-    function insertEnvironmentalSensors($uuid, $sensors) {
-        $environmentalSensors = array("humidity", "light", "pressure", "temperature");
-        $isAvailable = array();
-
-        foreach ($environmentalSensors as $sensor) {
-            if (in_array($sensor, $sensors)) {
-                array_push($isAvailable, true);
-            } else {
-                array_push($isAvailable, false);
-            }
-        }
-
-        $humidity = $isAvailable[0];
-        $light = $isAvailable[1];
-        $pressure = $isAvailable[2];
-        $temperature = $isAvailable[3];
+    function insertSensors($uuid, $deviceSensors) {
+        $allSensors = array("accelerometer", "gps", "gravity", "gyroscope", "humidity",
+        "light", "magnetometer", "pressure", "proximity", "temperature");
 
         $cxn = new \mysqli(HOST, USER, PASS, DB);
 
@@ -48,71 +35,15 @@
             return false;
         }
 
-        $stmt = $cxn->prepare("INSERT INTO EnvironmentalSensors VALUES (?, ?, ?, ?, ?);");
-        $stmt->bind_param("siiii", $uuid, $humidity, $light, $pressure, $temperature);
-        $stmt->execute();
-        $stmt->close();
-        $cxn->close();
+        $stmt = $cxn->prepare("INSERT INTO Sensors (uuid, name) VALUES (?, ?);");
+        $stmt->bind_param("ss", $uuid, $sensor);
 
-        return true;
-    }
-
-    function insertMotionSensors($uuid, $sensors) {
-        $motionSensors = array("accelerometer", "gravity", "gyroscope");
-        $isAvailable = array();
-
-        foreach ($motionSensors as $sensor) {
-            if (in_array($sensor, $sensors)) {
-                array_push($isAvailable, true);
-            } else {
-                array_push($isAvailable, false);
+        foreach ($allSensors as $sensor) {
+            if (in_array($sensor, $deviceSensors)) {
+                $stmt->execute();
             }
         }
 
-        $accelerometer = $isAvailable[0];
-        $gravity = $isAvailable[1];
-        $gyroscope = $isAvailable[2];
-
-        $cxn = new \mysqli(HOST, USER, PASS, DB);
-
-        if (mysqli_connect_errno()) {
-            return false;
-        }
-
-        $stmt = $cxn->prepare("INSERT INTO MotionSensors VALUES (?, ?, ?, ?);");
-        $stmt->bind_param("siii", $uuid, $accelerometer, $gravity, $gyroscope);
-        $stmt->execute();
-        $stmt->close();
-        $cxn->close();
-
-        return true;
-    }
-
-    function insertPositionSensors($uuid, $sensors) {
-        $positionSensors = array("gps", "magnetometer", "proximity");
-        $isAvailable = array();
-
-        foreach ($positionSensors as $sensor) {
-            if (in_array($sensor, $sensors)) {
-                array_push($isAvailable, true);
-            } else {
-                array_push($isAvailable, false);
-            }
-        }
-
-        $gps = $isAvailable[0];
-        $magnetometer = $isAvailable[1];
-        $proximity = $isAvailable[2];
-
-        $cxn = new \mysqli(HOST, USER, PASS, DB);
-
-        if (mysqli_connect_errno()) {
-            return false;
-        }
-
-        $stmt = $cxn->prepare("INSERT INTO PositionSensors VALUES (?, ?, ?, ?);");
-        $stmt->bind_param("siii", $uuid, $gps, $magnetometer, $proximity);
-        $stmt->execute();
         $stmt->close();
         $cxn->close();
 
@@ -126,7 +57,7 @@
             return false;
         }
 
-        $stmt = $cxn->prepare("UPDATE Devices SET connected = ? WHERE id = ?;");
+        $stmt = $cxn->prepare("UPDATE Devices SET connected = ? WHERE uuid = ?;");
         $stmt->bind_param("is", $status, $uuid);
         $stmt->execute();
         $stmt->close();
@@ -142,7 +73,7 @@
             return false;
         }
 
-        $stmt = $cxn->prepare("UPDATE Devices SET addr = ?, port = ? WHERE id = ?;");
+        $stmt = $cxn->prepare("UPDATE Devices SET addr = ?, port = ? WHERE uuid = ?;");
         $stmt->bind_param("sss", $addr, $port, $uuid);
         $stmt->execute();
         $stmt->close();

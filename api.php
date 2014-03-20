@@ -19,16 +19,12 @@
             $addr = $request->getIp();
             $port = $request->getPort();
 
-            $insertSuccess = true;
-
             // store in database
-            $insertSuccess = $insertSuccess && Model\insertNewDevice($uuid, $addr, $port);
-            $insertSuccess = $insertSuccess && Model\insertEnvironmentalSensors($uuid, $requestBody["sensors"]["environmental"]);
-            $insertSuccess = $insertSuccess && Model\insertMotionSensors($uuid, $requestBody["sensors"]["motion"]);
-            $insertSuccess = $insertSuccess && Model\insertPositionSensors($uuid, $requestBody["sensors"]["position"]);
+            $insertSuccess = Model\insertNewDevice($uuid, $addr, $port);
+            $insertSuccess = $insertSuccess && Model\insertSensors($uuid, $requestBody["sensors"]);
 
             if (!$insertSuccess) {
-                $response->setStatus;
+                $response->setStatus(500);
             } else {
                 $response->setStatus(200);
                 $response->headers->set("Content-Type", "application/json");
@@ -53,7 +49,7 @@
             $updateSuccess = Model\updateConnectionStatus($uuid, true);
 
             if (!updateSuccess) {
-                $response->setStatus(400);
+                $response->setStatus(500);
             } else {
                 $response->setStatus(200);
             }
@@ -78,7 +74,7 @@
             $updateSuccess = Model\updateConnectionAddressPort($uuid, $addr, $port);
 
             if (!updateSuccess) {
-                $response->setStatus(400);
+                $response->setStatus(500);
             } else {
                 $response->setStatus(200);
             }
@@ -101,7 +97,7 @@
             $updateSuccess = Model\updateConnectionStatus($uuid, false);
 
             if (!updateSuccess) {
-                $response->setStatus(400);
+                $response->setStatus(500);
             } else {
                 $response->setStatus(200);
             }

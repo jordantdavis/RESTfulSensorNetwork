@@ -2,63 +2,19 @@
 
     namespace Model;
 
-    /*
-        A set of functions for identifying valid json request bodies for each API method.
-
-        valid /connect json request:
-        {
-            sensors: {
-                environmental: [...],
-                position: [...],
-                motion: [...]
-            }
-        }
-
-        valid /connect, /update, /disconnect request json:
-        {
-            uuid: "..."
-        }
-    */
-
     function validateRegisterRequestJson($json) {
         if ($json != false) {
             if (is_array($json) && array_key_exists("sensors", $json) && count($json) == 1) {
-                $sensors = $json["sensors"];
-                $environmentalSensors = array("humidity", "light", "pressure", "temperature");
-                $motionSensors = array("accelerometer", "gravity", "gyroscope");
-                $positionSensors = array("gps", "magnetometer", "proximity");
+                $deviceSensors = $json["sensors"];
 
-                if (count($sensors) == 3 && array_key_exists("environmental", $sensors) &&
-                array_key_exists("motion", $sensors) && array_key_exists("position", $sensors)) {
+                if (is_array($deviceSensors) && count($deviceSensors) > 0 && count($deviceSensors) <= 10) {
+                    $allSensors = array("accelerometer", "gps", "gravity", "gyroscope", "humidity",
+                    "light", "magnetometer", "pressure", "proximity", "temperature");
 
-                    if (count($sensors["environmental"]) <= 4) {
-                        foreach ($sensors["environmental"] as $sensor) {
-                            if (!in_array($sensor, $environmentalSensors)) {
-                                return false;
-                            }
+                    foreach ($deviceSensors as $sensor) {
+                        if (!in_array($sensor, $allSensors)) {
+                            return false;
                         }
-                    } else {
-                        return false;
-                    }
-
-                    if (count($sensors["motion"]) <= 3) {
-                        foreach ($sensors["motion"] as $sensor) {
-                            if (!in_array($sensor, $motionSensors)) {
-                                return false;
-                            }
-                        }
-                    } else {
-                        return false;
-                    }
-
-                    if (count($sensors["position"]) <= 3) {
-                        foreach ($sensors["position"] as $sensor) {
-                            if (!in_array($sensor, $positionSensors)) {
-                                return false;
-                            }
-                        }
-                    } else {
-                        return false;
                     }
 
                     return true;

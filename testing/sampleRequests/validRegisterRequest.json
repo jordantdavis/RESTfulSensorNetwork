@@ -1,7 +1,5 @@
 {
-    "sensors": {
-        "environmental": ["light", "temperature"],
-        "motion": ["gyroscope"],
-        "position": ["gps"]
-    }
+    "sensors": [
+        "gps", "light", "temperature", "gyroscope"
+    ]
 }

@@ -6,11 +6,9 @@
         public function testValidateRegisterRequestJson() {
             $json = '
                 {
-                    "sensors": {
-                        "environmental": ["light", "temperature"],
-                        "motion": ["gyroscope"],
-                        "position": ["gps"]
-                    }
+                    "sensors": [
+                        "light", "temperature", "gyroscope", "gps"
+                    ]
                 }';
 
             $this->assertTrue(Model\validateRegisterRequestJson(json_decode($json, true)));
