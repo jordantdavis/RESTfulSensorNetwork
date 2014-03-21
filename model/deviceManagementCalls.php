@@ -2,10 +2,15 @@
 
     namespace Model;
 
+    // define("HOST", "127.0.0.1");
+    // define("USER", "COMP4302jdavis17");
+    // define("PASS", "YTM4NTM4YWNmYzA4Y2Nm");
+    // define("DB", "COMP4302jdavis17");
+
     define("HOST", "127.0.0.1");
-    define("USER", "COMP4302jdavis17");
-    define("PASS", "YTM4NTM4YWNmYzA4Y2Nm");
-    define("DB", "COMP4302jdavis17");
+    define("USER", "root");
+    define("PASS", "password");
+    define("DB", "RSN");
 
     function insertNewDevice($uuid, $addr, $port) {
         $cxn = new \mysqli(HOST, USER, PASS, DB);
