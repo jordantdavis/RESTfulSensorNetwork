@@ -48,7 +48,7 @@
             // change ipAddr and connection status in database
             $updateSuccess = Model\updateConnectionStatus($uuid, true);
 
-            if (!updateSuccess) {
+            if (!$updateSuccess) {
                 $response->setStatus(500);
             } else {
                 $response->setStatus(200);
@@ -73,7 +73,7 @@
             // change ipAddr in database
             $updateSuccess = Model\updateConnectionAddressPort($uuid, $addr, $port);
 
-            if (!updateSuccess) {
+            if (!$updateSuccess) {
                 $response->setStatus(500);
             } else {
                 $response->setStatus(200);
@@ -96,7 +96,7 @@
             // change connection status in database
             $updateSuccess = Model\updateConnectionStatus($uuid, false);
 
-            if (!updateSuccess) {
+            if (!$updateSuccess) {
                 $response->setStatus(500);
             } else {
                 $response->setStatus(200);
