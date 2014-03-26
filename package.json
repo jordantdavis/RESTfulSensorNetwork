@@ -1,0 +1,13 @@
+{
+  "name": "RSN",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node api.js"
+  },
+  "dependencies": {
+    "restify": "2.6.3",
+    "JSV": "4.0.2",
+    "mysql": "2.1.0"
+  }
+}
