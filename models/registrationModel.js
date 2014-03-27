@@ -58,18 +58,11 @@ function validateDeregisterRequest(json) {
 }
 
 function openConnection() {
-    // var connection = mysql.createConnection({
-    //     "host": "localhost",
-    //     "user": "COMP4302jdavis17",
-    //     "pass": "YTM4NTM4YWNmYzA4Y2Nm",
-    //     "database": "COMP4302jdavis17"
-    // });
-
     var connection = mysql.createConnection({
         "host": "localhost",
-        "user": "root",
-        "password": "password",
-        "database": "RSN"
+        "user": "COMP4302jdavis17",
+        "pass": "YTM4NTM4YWNmYzA4Y2Nm",
+        "database": "COMP4302jdavis17"
     });
 
     connection.connect(function(err) {
