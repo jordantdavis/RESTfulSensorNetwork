@@ -35,7 +35,7 @@ function validateRegisterRequest(json) {
     return true;
 }
 
-function validateDeregisterRequest(json) {
+function validateUnregisterRequest(json) {
     var schema = {
         "type": "object",
         "properties": {
@@ -61,7 +61,7 @@ function openConnection() {
     var connection = mysql.createConnection({
         "host": "localhost",
         "user": "COMP4302jdavis17",
-        "pass": "YTM4NTM4YWNmYzA4Y2Nm",
+        "password": "YTM4NTM4YWNmYzA4Y2Nm",
         "database": "COMP4302jdavis17"
     });
 
@@ -136,6 +136,6 @@ function removeDeviceAndSensors(registrationId) {
 }
 
 exports.validateRegisterRequest = validateRegisterRequest;
-exports.validateDeregisterRequest = validateDeregisterRequest;
+exports.validateUnregisterRequest = validateUnregisterRequest;
 exports.insertDeviceAndSensors = insertDeviceAndSensors;
 exports.removeDeviceAndSensors = removeDeviceAndSensors;

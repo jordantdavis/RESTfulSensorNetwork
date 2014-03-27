@@ -14,12 +14,12 @@ exports.registerJsonValidationTest = function(test) {
     test.done();
 };
 
-exports.deregisterJsonValidationTest = function(test) {
+exports.unregisterJsonValidationTest = function(test) {
     json = {
         "registrationId": "0"
     }
 
     test.expect(1);
-    test.equals(true, regModel.validateDeregisterRequest(json));
+    test.equals(true, regModel.validateUnregisterRequest(json));
     test.done();
 };

@@ -12,8 +12,8 @@ function registerHandler(req, res, next) {
     res.end();
 };
 
-function deregisterHandler(req, res, next) {
-    if (regModel.validateDeregisterRequest(req.body)) {
+function unregisterHandler(req, res, next) {
+    if (regModel.validateUnregisterRequest(req.body)) {
         var registrationId = req.body["registrationId"];
         regModel.removeDeviceAndSensors(registrationId);
     } else {
@@ -23,4 +23,4 @@ function deregisterHandler(req, res, next) {
 };
 
 exports.registerHandler = registerHandler;
-exports.deregisterHandler = deregisterHandler;
+exports.unregisterHandler = unregisterHandler;
