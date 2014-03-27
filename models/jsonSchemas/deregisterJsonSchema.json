@@ -1,8 +1,0 @@
-{
-    "properties": {
-        "registrationId": {
-            "type": "string",
-            "description": "Google Cloud Messaging device id."
-        }
-    }
-}

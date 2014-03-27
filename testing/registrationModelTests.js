@@ -1,16 +1,16 @@
 
-var validation = require("../models/registrationValidation.js");
+var regModel = require("../models/registrationModel.js");
 
 exports.registerJsonValidationTest = function(test) {
     json = {
         "registrationId": "0",
         "availableSensors": [
-            "gps", "network", "temperature"
+            "location", "temperature"
         ]
     }
 
     test.expect(1);
-    test.equals(true, validation.validateRegisterRequest(json));
+    test.equals(true, regModel.validateRegisterRequest(json));
     test.done();
 };
 
@@ -20,6 +20,6 @@ exports.deregisterJsonValidationTest = function(test) {
     }
 
     test.expect(1);
-    test.equals(true, validation.validateDeregisterRequest(json));
+    test.equals(true, regModel.validateDeregisterRequest(json));
     test.done();
 };
