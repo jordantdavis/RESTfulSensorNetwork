@@ -6,8 +6,10 @@
     "start": "node api.js"
   },
   "dependencies": {
-    "restify": "2.6.3",
+    "restify": "2.7.0",
     "JSV": "4.0.2",
-    "mysql": "2.1.0"
+    "mysql": "2.1.1",
+    "async": "0.6.2",
+    "node-gcm": "0.9.10"
   }
 }

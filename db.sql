@@ -1,11 +1,21 @@
 CREATE TABLE Devices (
-    shortId INT NOT NULL AUTO_INCREMENT,
+    shortId INTEGER NOT NULL AUTO_INCREMENT,
     registrationId TEXT NOT NULL,
+    isOnline BOOLEAN NOT NULL,
     PRIMARY KEY(shortId)
 );
 
 CREATE TABLE AvailableSensors (
-    shortId INT NOT NULL,
+    shortId INTEGER NOT NULL,
     sensorName CHAR(50) NOT NULL,
     PRIMARY KEY(shortId, sensorName)
+);
+
+CREATE TABLE Schedules (
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    sensorName VARCHAR(50) NOT NULL,
+    startTime INTEGER NOT NULL,
+    endTime INTEGER NOT NULL,
+    frequency FLOAT NOT NULL,
+    PRIMARY KEY(id)
 );
