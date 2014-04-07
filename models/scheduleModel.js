@@ -11,7 +11,7 @@ module.exports = {
     *    Checks if incoming schedule request body is in the correct format.
     *    @param {json} json - Body of the schedule request.
     */
-    validateScheduleRequest: function(json) {
+    validateScheduleCreateRequest: function(json) {
         var schema = {
             "type": "object",
             "properties": {

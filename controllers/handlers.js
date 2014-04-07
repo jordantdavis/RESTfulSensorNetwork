@@ -108,25 +108,41 @@ module.exports = {
         }
     },
 
-    schedule: function(request, response, next) {
+    /*
+    *    Handles incoming schedule creation request.
+    *    @param {http.IncomingMessage} request - Incoming request.
+    *    @param {http.ServerResponse} response - Outgoing response.
+    *    @param {function} next - Runs error handlers.
+    */
+    scheduleCreate: function(request, response, next) {
+        // if the request body is valid, continue
         if (schedModel.validateScheduleRequest(request["body"])) {
+            // extract request data
             var requireAllSensors = request["body"]["requireAllSensors"];
             var schedules = request["body"]["schedules"];
 
             async.waterfall([
+                // task #1 - get device ids for devices with given sensors
                 function(callback) {
                     schedModel.getAllApplicableDevices(requireAllSensors, schedules, callback);
                 },
+                // task #2 - get schedules to appropriate devices
                 function(registrationIds, callback) {
                     schedModel.sendSchedules(registrationIds, schedules, callback);
                 },
+                // task #3 - log schedules in database
                 function(callback) {
                     schedModel.insertSchedules(schedules, callback);
                 }
-            ], function(err) {
+            ],
+            // main callback
+            function(err) {
+                // if a database error occurred, throw an HTTP 500 - Internal Error
                 if (err) {
                     next(new restify.InternalError("An error occurred on the server."));
-                } else {
+                }
+                // otherwise, the scheduling was successful, send an HTTP 200 - OK
+                else {
                     response.send({
                         "code": "OK",
                         "message": "Scheduling successful."
@@ -134,7 +150,9 @@ module.exports = {
                     next();
                 }
             });
-        } else {
+        }
+        // if the request body is not valid, throw an HTTP 400 - Bad Request
+        else {
             next(new restify.BadRequestError("Invalid schedule request body format."));
         }
     }
