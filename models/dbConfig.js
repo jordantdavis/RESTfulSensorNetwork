@@ -8,18 +8,18 @@ var mysql = require("mysql");
 module.exports = {
     openConnection: function(callback) {
         // database credentials
-        // var connection = mysql.openConnection({
-        //     "host": "localhost",
-        //     "user": "COMP4302jdavis17",
-        //     "password": "YTM4NTM4YWNmYzA4Y2Nm",
-        //     "database": "COMP4302jdavis17"
-        // });
         var connection = mysql.createConnection({
             "host": "localhost",
-            "user": "root",
-            "password": "password",
-            "database": "RSN"
+            "user": "COMP4302jdavis17",
+            "password": "YTM4NTM4YWNmYzA4Y2Nm",
+            "database": "COMP4302jdavis17"
         });
+        // var connection = mysql.createConnection({
+        //     "host": "localhost",
+        //     "user": "root",
+        //     "password": "password",
+        //     "database": "RSN"
+        // });
 
         // connect using the credentials above
         connection.connect(function(err) {
