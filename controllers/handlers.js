@@ -116,7 +116,7 @@ module.exports = {
     */
     scheduleCreate: function(request, response, next) {
         // if the request body is valid, continue
-        if (schedModel.validateScheduleRequest(request["body"])) {
+        if (schedModel.validateScheduleCreateRequest(request["body"])) {
             // extract request data
             var requireAllSensors = request["body"]["requireAllSensors"];
             var schedules = request["body"]["schedules"];

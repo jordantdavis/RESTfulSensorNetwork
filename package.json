@@ -1,15 +1,16 @@
 {
-  "name": "RSN",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
+    "name": "RSN",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
     "start": "node api.js"
-  },
-  "dependencies": {
-    "restify": "2.7.0",
-    "JSV": "4.0.2",
-    "mysql": "2.1.1",
-    "async": "0.6.2",
-    "node-gcm": "0.9.10"
-  }
+    },
+    "dependencies": {
+        "async": "0.6.2",
+        "JSV": "4.0.2",
+        "mysql": "2.1.1",
+        "node-gcm": "0.9.10",
+        "plotly": "0.2.4",
+        "restify": "2.7.0"
+    }
 }
