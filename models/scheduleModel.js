@@ -161,7 +161,6 @@ module.exports = {
         async.each(sensorLevelSchedules, function(messageItems, callback) {
             var message = new gcm.Message({
                 timeToLive: 30,
-                dryRun: true,
                 data: {
                     "schedule": messageItems["schedule"]
                 }
