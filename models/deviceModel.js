@@ -21,6 +21,7 @@ module.exports = {
                 },
                 "availableSensors": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "type": "string",
                         "enum": [
@@ -241,5 +242,9 @@ module.exports = {
                 callback(null);
             }
         });
+    },
+
+    toogleIsOnline: function(registrationId) {
+
     }
 };
