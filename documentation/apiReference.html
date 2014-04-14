@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>RSN Scheduler</title>
+        <meta charset="utf-8">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet">
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="jumbotron text-center">
+            <h1>API Reference</h1>
+        </div>
+
+        <div class="container">
+            <div class="page-header">
+                <h2>Resources Overview</h2>
+            </div>
+            <table class="table table-hover">
+                <thead>
+                    <td>Resource</td>
+                    <td>Description</td>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#device-register-doc-container">POST /device/register</a></td>
+                        <td>Creates a new GCM registered device with a set of available sensors.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#device-unregister-doc-container">POST /device/unregister</a></td>
+                        <td>Removes an existing GCM registered device.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#schedule-create-doc-container">POST /schedule/create</a></td>
+                        <td>Creates a new schedule containing sensors to sample for a given duration at a specified frequency.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="page-header">
+                <h2>Resource Details</h2>
+            </div>
+
+            <div id="device-register-doc-container">
+                <div class="page-header">
+                    <h3>POST /device/register</h3>
+                </div>
+
+                Creates a new GCM registered device with a set of available sensors.
+
+                <div class="page-header">
+                    <h4>Parameters</h4>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        registrationId (string)<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        A Google Cloud Messaging provided registrationID for the new device.
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3">
+                        availableSensors (array[string])<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        An array of sensors names available on the new device.  The possible values for
+                        sensors are:  accelerometer, gyroscope, humidity, light, location,
+                        magnetometer, pressure, proximity, and/or temperature.
+                    </div>
+                </div>
+            </div>
+
+            <div id="device-unregister-doc-container">
+                <div class="page-header">
+                    <h3>POST /device/unregister</h3>
+                </div>
+
+                Removes an existing GCM registered device.
+
+                <div class="page-header">
+                    <h4>Parameters</h4>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        registrationId (string)<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        A Google Cloud Messaging provided registrationID for an existing device.
+                    </div>
+                </div>
+            </div>
+
+            <div id="schedule-create-doc-container">
+                <div class="page-header">
+                    <h3>POST /schedule/create</h3>
+                </div>
+
+                Creates a new schedule containing sensors to sample for a given duration at a specified frequency.
+
+                <div class="page-header">
+                    <h4>Parameters</h4>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        requireAllSensors (boolean)<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        Whether or not a device must have all sensors in order to provide samples.
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3">
+                        schedules (array[Schedule])<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        An array of schedule objects.
+                    </div>
+                </div>
+
+                <div class="page-header">
+                    <h4>Types</h4>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        sensorName (string)<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        The name of a sensor to sample.  The possible values for sensors are:
+                        accelerometer, gyroscope, humidity, light, location, magnetometer, pressure,
+                        proximity, and/or temperature.
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3">
+                        startTime (int)<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        Sampling start time in epoch time (seconds).
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3">
+                        endTime (int)<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        Sampling end time in epoch time (seconds).
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3">
+                        frequency (int/float)<br>
+                        <b>(required)</b>
+                    </div>
+                    <div class="col-offset-1 col-md-8">
+                        Sampling speed (in Hz).
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
+    </body>
+</html>
