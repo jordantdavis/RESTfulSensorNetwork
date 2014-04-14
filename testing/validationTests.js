@@ -27,7 +27,6 @@ exports.unregisterJsonValidationTest = function(test) {
 
 exports.scheduleJsonValidationTest = function(test) {
     json = {
-        "requireAllSensors": true,
         "schedules": [
             {
                 "sensorName": "location",
@@ -45,6 +44,6 @@ exports.scheduleJsonValidationTest = function(test) {
     };
 
     test.expect(1);
-    test.equals(true, schedModel.validateScheduleRequest(json));
+    test.equals(true, schedModel.validateScheduleCreateRequest(json));
     test.done();
 }

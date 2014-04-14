@@ -118,13 +118,12 @@ module.exports = {
         // if the request body is valid, continue
         if (schedModel.validateScheduleCreateRequest(request["body"])) {
             // extract request data
-            var requireAllSensors = request["body"]["requireAllSensors"];
             var schedules = request["body"]["schedules"];
 
             async.waterfall([
                 // task #1 - get device ids for devices with given sensors
                 function(callback) {
-                    schedModel.getAllApplicableDevices(requireAllSensors, schedules, callback);
+                    schedModel.getAllApplicableDevices(schedules, callback);
                 },
                 // task #2 - get schedules to appropriate devices
                 function(registrationIds, callback) {

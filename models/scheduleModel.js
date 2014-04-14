@@ -15,10 +15,6 @@ module.exports = {
         var schema = {
             "type": "object",
             "properties": {
-                "requireAllSensors": {
-                    "type": "boolean",
-                    "required": true
-                },
                 "schedules": {
                     "type": "array",
                     "uniqueItems": true,
@@ -95,21 +91,16 @@ module.exports = {
         });
     },
 
-    getAllApplicableDevices: function(allSensorsRequired, schedule, callback) {
-        if (allSensorsRequired) {
-            var statement = "";
-            callback("Not implemented!", null);
-        } else {
-            async.map(schedule, function(schedItem, callback) {
-                module.exports.getDevicesWithSensor(schedItem["sensorName"], callback);
-            }, function(err, registrationIds) {
-                if (err) {
-                    callback(err, null);
-                } else {
-                    callback(null, registrationIds);
-                }
-            });
-        }
+    getAllApplicableDevices: function(schedule, callback) {
+        async.map(schedule, function(schedItem, callback) {
+            module.exports.getDevicesWithSensor(schedItem["sensorName"], callback);
+        }, function(err, registrationIds) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, registrationIds);
+            }
+        });
     },
 
     insertSchedules: function(schedules, callback) {
