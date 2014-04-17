@@ -59,14 +59,21 @@ module.exports = {
         return true;
     },
 
+    /*
+    *    Gets registration IDs of devices with a given sensor.
+    *    @param {string} sensorName - Name of a sensor.
+    *    @param {function} callback - Callback used to obtain the result of the query.
+    */
     getDevicesWithSensor: function(sensorName, callback) {
-        var statement = "SELECT registrationId FROM Devices INNER JOIN AvailableSensors ON " +
-            "Devices.shortId = AvailableSensors.shortId WHERE sensorName = ? AND isOnline = true;";
         async.waterfall([
+            // task 1 - open database connection
             function(callback) {
                 db.openConnection(callback);
             },
+            // task 2 - query for registration IDs of devices with given sensor and destroy database connection
             function(connection, callback) {
+                var statement = "SELECT registrationId FROM Devices INNER JOIN AvailableSensors ON " +
+                    "Devices.shortId = AvailableSensors.shortId WHERE sensorName = ? AND isOnline = true;";
                 connection.query(statement, [sensorName], function(err, rows) {
                     db.closeConnection(connection);
                     if (err) {

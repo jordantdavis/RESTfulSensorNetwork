@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>RSN</title>
+        <meta charset="utf-8">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet">
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+
+    </head>
+    <body>
+        <div class="container">
+            <div class="jumbotron text-center">
+                <h1>Create Schedule</h1>
+            </div>
+
+            <div id="schedules">
+                <div class="well schedule">
+                    <label>Sensor</label>
+                    <select class="form-control sensor-name">
+                        <option value="Accelerometer">Accelerometer</option>
+                        <option value="Temperature">Temperature</option>
+                        <option value="Gyroscope">Gyroscope</option>
+                        <option value="Light">Light</option>
+                        <option value="Magnetometer">Magnetometer</option>
+                        <option value="Pressure">Pressure</option>
+                        <option value="Proximity">Proximity</option>
+                        <option value="Humidity">Humidity</option>
+                    </select>
+
+                    <label>Start Time</label>
+                    <input type="text" class="form-control start-time" placeholder="">
+
+                    <label>End Time</label>
+                    <input type="text" class="form-control end-time" placeholder="">
+
+                    <label>Frequency</label>
+                    <input type="text" class="form-control frequency" placeholder="">
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="button" class="btn btn-success btn-sm" id="add-schedule">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            </div>
+
+            <br>
+
+            <div class="well">
+                <div id="results"></div>
+            </div>
+
+            <br>
+
+            <div class="well text-center">
+                <button type="button" class="btn btn-lg btn-primary" id="send-button">Send</button>
+                <button type="button" class="btn btn-lg btn-danger" id="clear-button">Clear</button>
+            </div>
+        </div>
+
+        <script>
+            $("#add-schedule").on("click", function() {
+                var temp = $(".schedule").first().clone();
+                temp = temp.appendTo("#schedules");
+                temp.prepend(
+                    '<div class="text-right"> \
+                        <button type="button" class="btn btn-danger btn-sm remove-schedule"> \
+                            <span class="glyphicon glyphicon-remove"></span> \
+                        </button> \
+                    </div>'
+                );
+            });
+
+            $("#schedules").on("click", ".remove-schedule", function() {
+                console.log($(this), "removed!");
+                $(this).parent().parent().remove();
+            });
+
+            $("#send-button").on("click", function() {
+                var sensorNameElems = $(".sensor-name option:selected");
+                var startTimeElems = $(".start-time");
+                var endTimeElems = $(".end-time");
+                var frequencyElems = $(".frequency");
+                var schedulesArray = [];
+
+                for (var i = 0; i < sensorNameElems.length; i++) {
+                    schedulesArray.push(
+                        {
+                            "sensorName": sensorNameElems.eq(i).val(),
+                            "startTime": parseInt(startTimeElems.eq(i).val()),
+                            "endTime": parseInt(endTimeElems.eq(i).val()),
+                            "frequency": parseFloat(frequencyElems.eq(i).val())
+                        }
+                    );
+                }
+
+                var schedules = JSON.stringify({ "schedules": schedulesArray });
+
+                $.ajax({
+                    url: "http://hnat-server.cs.memphis.edu:9263/schedule/create",
+                    type: "POST",
+                    crossDomain: true,
+                    contentType: "application/json",
+                    data: schedules,
+                    success: function(data, status) {
+                        $("#results").html(data);
+                    },
+                    error: function(jqXHR, status) {
+                        $("#results").html(status);
+                    }
+                });
+            });
+
+            $("#clear-button").on("click", function() {
+                $("#results").html("");
+            });
+        </script>
+    </body>
+</html>

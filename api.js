@@ -5,6 +5,7 @@ var handlers = require("./controllers/handlers.js");
 
 var server = restify.createServer();
 server.use(restify.bodyParser());
+server.use(restify.CORS());
 // routes
 server.post("/device/register", handlers.deviceRegister);
 server.post("/device/unregister", handlers.deviceUnregister);
