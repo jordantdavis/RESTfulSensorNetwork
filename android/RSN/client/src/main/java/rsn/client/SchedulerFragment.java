@@ -21,7 +21,7 @@ public class SchedulerFragment extends Fragment {
         mRootView = inflater.inflate(R.layout.fragment_scheduler, container, false);
         mWebView = (WebView)(mRootView.findViewById(R.id.web_view));
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.loadUrl("http://hnat-server.cs.memphis.edu/~yqlin/test.html");
+        mWebView.loadUrl("http://hnat-server.cs.memphis.edu/~jdavis17/rsn/scheduler.html");
 
         return mRootView;
     }

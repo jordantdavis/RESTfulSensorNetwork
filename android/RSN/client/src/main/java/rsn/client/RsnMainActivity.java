@@ -2,12 +2,18 @@ package rsn.client;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -43,24 +49,16 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String SENDER_ID = "928553698734";
 
+    private static final int SCHEDULER_TAB = 0;
+    private static final int VISUALIZER_TAB = 1;
+    private static final int LOGGER_TAB = 2;
+
     private boolean hasBeenPromptedForReg = false;
     private String registrationId = "";
     private GoogleCloudMessaging gcm;
-    private Context context = this;
+    private Context context;
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     private ViewPager mViewPager;
 
     @Override
@@ -68,21 +66,20 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rsn_main);
 
-        // Set up the action bar.
+        context = getApplicationContext();
+
+        // set up action bar
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+        // set up adapter for tabs
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        // set up fragment view and set its adapter
+        mViewPager = (ViewPager)(findViewById(R.id.pager));
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        // When swiping between different sections, select the corresponding
-        // tab. We can also use ActionBar.Tab#select() to do this if we have
-        // a reference to the Tab.
+        // listener to allow for movement between tabs
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -90,28 +87,25 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
             }
         });
 
-        // For each of the sections in the app, add a tab to the action bar.
+        // set the tabs to the action bar
         for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-            // Create a tab with text corresponding to the page title defined by
-            // the adapter. Also specify this Activity object, which implements
-            // the TabListener interface, as the callback (listener) for when
-            // this tab is selected.
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(mSectionsPagerAdapter.getPageTitle(i))
-                            .setTabListener(this));
+            actionBar.addTab(actionBar.newTab()
+                .setText(mSectionsPagerAdapter.getPageTitle(i))
+                .setTabListener(this));
         }
 
+        // check to see if the device has Google Play Services
         if (checkPlayServices()) {
             registrationId = getGcmRegistrationId();
 
+            // find out if the user has been prompted to register with GCM/RSN
             if (savedInstanceState == null) {
                 hasBeenPromptedForReg = false;
             } else {
                 hasBeenPromptedForReg = savedInstanceState.getBoolean(SAVED_INST_HAS_BEEN_PROMPTED, false);
             }
 
-
+            // if the user is not registered and they have not been prompted to register
             if (registrationId.isEmpty() && !hasBeenPromptedForReg) {
                 promptForGcmRegistration();
                 hasBeenPromptedForReg = true;
@@ -120,6 +114,7 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
     }
 
     protected void onSaveInstanceState(Bundle outState) {
+        // save whether or not the user was prompted to register
         outState.putBoolean(SAVED_INST_HAS_BEEN_PROMPTED, hasBeenPromptedForReg);
         super.onSaveInstanceState(outState);
     }
@@ -162,6 +157,7 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    // present the user with an alert dialog to register
     private void promptForGcmRegistration() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("GCM Registration")
@@ -175,16 +171,16 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
 
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
+            public void onClick(DialogInterface dialog, int which) {}
         });
 
         builder.show();
     }
 
+    // check for Google Play Services on the device
     private boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        // if the device does not have it and it can be downloaded, alert
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
@@ -207,9 +203,10 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
     }
 
     private SharedPreferences getGcmPreferences() {
-        return getSharedPreferences(RsnMainActivity.class.getSimpleName(), this.MODE_PRIVATE);
+        return getSharedPreferences(RsnMainActivity.class.getSimpleName(), MODE_PRIVATE);
     }
 
+    // register with GCM and RSN in the background
     private void gcmRegisterInBackground() {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -218,10 +215,12 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(context);
                     }
-
+                    // GCM register
                     registrationId = gcm.register(SENDER_ID);
+                    // RSN register
+                    registerDeviceOnServer(registrationId, getAvailableSensors());
+                    // store registration ID in preferences
                     setGcmRegistrationId(registrationId);
-                    // register on server
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -235,6 +234,7 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         }.execute();
     }
 
+    // unregister with GCM and RSN in the background
     private void gcmUnregisterInBackground() {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -244,8 +244,11 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
                         gcm = GoogleCloudMessaging.getInstance(context);
                     }
 
+                    // GCM unregister
                     gcm.unregister();
-                    // unregister on server
+                    // RSN unregister
+                    unregisterDeviceOnServer(registrationId);
+                    // erase registration ID from preferences
                     registrationId = "";
                     setGcmRegistrationId(registrationId);
                 } catch (IOException e) {
@@ -261,10 +264,11 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         }.execute();
     }
 
+    // register the device with RSN
     private void registerDeviceOnServer(String registrationId, String[] availableSensors) {
-        String path = "http://hnat-server.cs.memphis.edu:9263/device/register";
+        String resource = "http://hnat-server.cs.memphis.edu:9263/device/register";
         HttpClient client = new DefaultHttpClient();
-        HttpPost request = new HttpPost(path);
+        HttpPost request = new HttpPost(resource);
         HttpResponse response;
         JSONObject obj = new JSONObject();
         JSONArray arr = new JSONArray();
@@ -292,10 +296,11 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         }
     }
 
+    // unregister the device with RSN
     private void unregisterDeviceOnServer(String registrationId) {
-        String path = "http://hnat-server.cs.memphis.edu:9263/unregister";
+        String resource = "http://hnat-server.cs.memphis.edu:9263/unregister";
         HttpClient client = new DefaultHttpClient();
-        HttpPost request = new HttpPost(path);
+        HttpPost request = new HttpPost(resource);
         HttpResponse response;
         JSONObject json = new JSONObject();
         StringEntity strEntity = null;
@@ -316,12 +321,53 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         }
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    // get all sensors on the device
+    private String[] getAvailableSensors() {
+        Set<String> availableSensors = new HashSet<String>();
+        SensorManager sensorManager = (SensorManager)(getSystemService(Context.SENSOR_SERVICE));
+        LocationManager locationManager = (LocationManager)(getSystemService(Context.LOCATION_SERVICE));
 
+        for (Sensor sensor : sensorManager.getSensorList(Sensor.TYPE_ALL)) {
+            switch(sensor.getType()) {
+                case Sensor.TYPE_ACCELEROMETER:
+                    availableSensors.add("accelerometer");
+                    break;
+                case Sensor.TYPE_AMBIENT_TEMPERATURE:
+                    availableSensors.add("temperature");
+                    break;
+                case Sensor.TYPE_GYROSCOPE:
+                    availableSensors.add("gyroscope");
+                    break;
+                case Sensor.TYPE_LIGHT:
+                    availableSensors.add("light");
+                    break;
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    availableSensors.add("magnetometer");
+                    break;
+                case Sensor.TYPE_PRESSURE:
+                    availableSensors.add("pressure");
+                    break;
+                case Sensor.TYPE_PROXIMITY:
+                    availableSensors.add("proximity");
+                    break;
+                case Sensor.TYPE_RELATIVE_HUMIDITY:
+                    availableSensors.add("humidity");
+                    break;
+            }
+        }
+
+        for (String locationProvider : locationManager.getAllProviders()) {
+            if (locationProvider.equals(LocationManager.GPS_PROVIDER) || locationProvider.equals(LocationManager.NETWORK_PROVIDER)) {
+                availableSensors.add("location");
+                break;
+            }
+        }
+
+        return Arrays.copyOf(availableSensors.toArray(), availableSensors.size(), String[].class);
+    }
+
+    // adapter to map tabs to fragments
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
