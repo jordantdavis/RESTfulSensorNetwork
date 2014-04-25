@@ -24,24 +24,33 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name="rsn.client.RsnMainActivity"
+            android:name=".ui.RsnMainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <receiver
-            android:name=".GcmBroadcastReceiver"
+            android:name=".gcm.GcmMessageBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="com.example.gcm" />
             </intent-filter>
         </receiver>
-        <service android:name=".GcmIntentService" />
+
+         <receiver
+            android:name=".scheduler.RsnSchedulerAlarmBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="rsn.SCHEDULER_ALARM" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".gcm.GcmMessageService" />
+        <service android:name=".scheduler.RsnScheduleDispatcherService" />
     </application>
 
 </manifest>

@@ -19,3 +19,11 @@ CREATE TABLE Schedules (
     frequency FLOAT NOT NULL,
     PRIMARY KEY(id)
 );
+
+CREATE TABLE SensorData (
+    shortId INTEGER NOT NULL,
+    sensorName VARCHAR(50) NOT NULL,
+    timestamp INTEGER NOT NULL,
+    sampleValue INTEGER NOT NULL,
+    PRIMARY KEY(shortId, sensorName, timestamp);
+);

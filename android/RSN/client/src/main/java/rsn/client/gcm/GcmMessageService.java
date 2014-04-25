@@ -1,4 +1,4 @@
-package rsn.client;
+package rsn.client.gcm;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -10,16 +10,25 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import rsn.client.R;
+import rsn.client.scheduler.ScheduleAccessor;
+import rsn.client.ui.RsnMainActivity;
+import rsn.client.scheduler.Schedule;
+
 /**
  * Created by jordan on 4/20/14.
  */
-public class GcmIntentService extends IntentService {
-    private static final int NOTIFICATION_ID = 1;
-    private NotificationManager mNotificationManager;
-    private NotificationCompat.Builder builder;
+public class GcmMessageService extends IntentService {
+    private static final int NOTIFICATION_ID = 9263;
 
-    public GcmIntentService() {
-        super("GcmIntentService");
+    private NotificationManager mNotificationManager;
+    private NotificationCompat.Builder mBuilder;
+
+    public GcmMessageService() {
+        super("GcmMessageService");
     }
 
     @Override
@@ -30,18 +39,29 @@ public class GcmIntentService extends IntentService {
         // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
 
+        JSONObject scheduleJson = null;
+
         if (!extras.isEmpty()) {
-            if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                sendNotification("Send error: " + extras.toString());
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                sendNotification("Deleted messages on server: " + extras.toString());
-                // If it's a regular GCM message, do some work.
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                sendNotification("Received: " + extras.toString());
+            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+                try {
+                    scheduleJson = new JSONObject(extras.getString("schedule"));
+
+                    String sensorName = scheduleJson.getString("sensorName");
+                    int startTime = scheduleJson.getInt("startTime");
+                    int endTime = scheduleJson.getInt("endTime");
+                    double frequency = scheduleJson.getDouble("frequency");
+
+                    Schedule schedule = new Schedule(sensorName, startTime, endTime, frequency);
+                    ScheduleAccessor scheduleAccessor = new ScheduleAccessor(this);
+                    scheduleAccessor.appendSchedule(schedule);
+                    sendNotification("New RSN schedule received.");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
-        GcmBroadcastReceiver.completeWakefulIntent(intent);
+        GcmMessageBroadcastReceiver.completeWakefulIntent(intent);
     }
 
     private void sendNotification(String msg) {
@@ -51,7 +71,7 @@ public class GcmIntentService extends IntentService {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.ic_launcher)
-            .setContentTitle("GCM Notification")
+            .setContentTitle("RSN Notification")
             .setStyle(new NotificationCompat.BigTextStyle()
             .bigText(msg))
             .setContentText(msg);

@@ -1,4 +1,4 @@
-package rsn.client;
+package rsn.client.ui;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -7,9 +7,12 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -42,6 +45,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import rsn.client.R;
+
 public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabListener {
     private static final String SAVED_INST_HAS_BEEN_PROMPTED = "hasBeenPrompted";
     private static final String PREFS_REGISTRATION_ID = "registrationId";
@@ -49,9 +54,7 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String SENDER_ID = "928553698734";
 
-    private static final int SCHEDULER_TAB = 0;
-    private static final int VISUALIZER_TAB = 1;
-    private static final int LOGGER_TAB = 2;
+    private static final int MINUTE_IN_MILLIS = 60 * 1000;
 
     private boolean hasBeenPromptedForReg = false;
     private String registrationId = "";
@@ -111,6 +114,11 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
                 hasBeenPromptedForReg = true;
             }
         }
+
+        AlarmManager alarmManager = (AlarmManager)(getSystemService(Context.ALARM_SERVICE));
+        Intent intent = new Intent("rsn.SCHEDULER_ALARM");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), MINUTE_IN_MILLIS, pendingIntent);
     }
 
     protected void onSaveInstanceState(Bundle outState) {

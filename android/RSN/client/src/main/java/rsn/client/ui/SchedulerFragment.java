@@ -1,4 +1,4 @@
-package rsn.client;
+package rsn.client.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,14 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
+import rsn.client.R;
+
 /**
  * Created by jordan on 4/15/14.
  */
 public class SchedulerFragment extends Fragment {
     private View mRootView;
     private WebView mWebView;
-
-    public SchedulerFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
