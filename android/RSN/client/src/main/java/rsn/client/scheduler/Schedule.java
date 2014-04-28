@@ -17,11 +17,11 @@ import java.util.Scanner;
  */
 public class Schedule {
     private String sensorName;
-    private int startTime;
-    private int endTime;
+    private long startTime;
+    private long endTime;
     private double frequency;
 
-    public Schedule(String name, int start, int end, double freq) {
+    public Schedule(String name, long start, long end, double freq) {
         sensorName = name;
         startTime = start;
         endTime = end;
@@ -32,11 +32,11 @@ public class Schedule {
         return sensorName;
     }
 
-    public int getStartTime() {
+    public long getStartTime() {
         return startTime;
     }
 
-    public int getEndTime() {
+    public long getEndTime() {
         return endTime;
     }
 

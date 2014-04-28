@@ -20,7 +20,7 @@ CREATE TABLE Schedules (
     PRIMARY KEY(id)
 );
 
-CREATE TABLE SensorData (
+CREATE TABLE SensorSamples (
     shortId INTEGER NOT NULL,
     sensorName VARCHAR(50) NOT NULL,
     timestamp INTEGER NOT NULL,

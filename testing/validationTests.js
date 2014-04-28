@@ -1,9 +1,10 @@
 
 var deviceModel = require("./../models/deviceModel.js");
 var schedModel = require("./../models/scheduleModel.js");
+var sensorDataModel = require("./../models/sensorDataModel.js");
 
 exports.registerJsonValidationTest = function(test) {
-    json = {
+    var json = {
         "registrationId": "0",
         "availableSensors": [
             "location", "temperature"
@@ -16,7 +17,7 @@ exports.registerJsonValidationTest = function(test) {
 }
 
 exports.unregisterJsonValidationTest = function(test) {
-    json = {
+    var json = {
         "registrationId": "0"
     };
 
@@ -26,7 +27,7 @@ exports.unregisterJsonValidationTest = function(test) {
 }
 
 exports.scheduleJsonValidationTest = function(test) {
-    json = {
+    var json = {
         "schedules": [
             {
                 "sensorName": "location",
@@ -45,5 +46,40 @@ exports.scheduleJsonValidationTest = function(test) {
 
     test.expect(1);
     test.equals(true, schedModel.validateScheduleCreateRequest(json));
+    test.done();
+}
+
+exports.sensorSampleUploadValidationTest = function(test) {
+    var json = {
+        "registrationId": "0",
+        "samples": [
+            {
+                "sensorName": "accelerometerZ",
+                "timestamp": 1396454692,
+                "sensorValue": -1.0
+            },
+            {
+                "sensorName": "temperature",
+                "timestamp": 1396454692,
+                "sensorValue": 75
+            }
+        ]
+    }
+
+    test.expect(1);
+    test.equals(true, sensorDataModel.validateSampleUploadRequest(json));
+    test.done();
+}
+
+exports.sensorSampleDownloadValidationTest = function(test) {
+    var json = {
+        "sensorName": "magnetometerX",
+        "startTime": 1396454392,
+        "endTime": 1396454692,
+        "shortIds": ["0", "1", "2"]
+    };
+
+    test.expect(1);
+    test.equals(true, sensorDataModel.validateSampleDownloadRequest(json));
     test.done();
 }

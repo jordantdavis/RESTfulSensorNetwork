@@ -4,6 +4,7 @@ var restify = require("restify");
 
 var deviceModel = require("./../models/deviceModel.js");
 var schedModel = require("./../models/scheduleModel.js");
+var sensorDataModel = require("./../models/sensorDataModel.js");
 
 module.exports = {
     /*
@@ -153,6 +154,22 @@ module.exports = {
         // if the request body is not valid, throw an HTTP 400 - Bad Request
         else {
             next(new restify.BadRequestError("Invalid schedule request body format."));
+        }
+    },
+
+    sampleUpload: function(request, response, next) {
+        if (sensorDataModel.validateSampleUpload(request["body"])) {
+
+        } else {
+            next(new restify.BadRequestError("Invalid sensor data upload request body format."));
+        }
+    },
+
+    sampleDownload: function(request, response, next) {
+        if (sensorDataModel.validateSampleDownloadRequest(request["body"])) {
+            // valid request
+        } else {
+            next(new restify.BadRequestError("Invalid sensor data retrieval request body format."));
         }
     }
 };
