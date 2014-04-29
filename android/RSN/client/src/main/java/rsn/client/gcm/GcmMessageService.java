@@ -53,7 +53,7 @@ public class GcmMessageService extends IntentService {
 
                     Schedule schedule = new Schedule(sensorName, startTime, endTime, frequency);
                     ScheduleAccessor scheduleAccessor = new ScheduleAccessor(this);
-                    scheduleAccessor.appendSchedule(schedule);
+                    scheduleAccessor.addSchedule(schedule);
                     sendNotification("New RSN schedule received.");
                 } catch (JSONException e) {
                     e.printStackTrace();

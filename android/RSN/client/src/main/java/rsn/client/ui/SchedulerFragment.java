@@ -19,7 +19,7 @@ public class SchedulerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_scheduler, container, false);
-        mWebView = (WebView)(mRootView.findViewById(R.id.web_view));
+        mWebView = (WebView)(mRootView.findViewById(R.id.scheduler_web_view));
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadUrl("http://hnat-server.cs.memphis.edu/~jdavis17/rsn/scheduler.html");
 

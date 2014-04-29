@@ -2,7 +2,6 @@ package rsn.client.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +29,10 @@ public class LoggerFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ScheduleAccessor scheduleAccessor = new ScheduleAccessor(getActivity());
         ArrayList<Schedule> schedules = scheduleAccessor.getAllSchedules();
+//        ArrayList<Schedule> schedules = new ArrayList<Schedule>();
+//        schedules.add(new Schedule("accelerometer", 0, 60, 1));
+//        schedules.add(new Schedule("gyroscope", 0, 60, 1));
+//        schedules.add(new Schedule("magnetometer", 0, 60, 1));
 
         ArrayAdapter<Schedule> adapter = new ArrayAdapter<Schedule>(inflater.getContext(),
                 android.R.layout.simple_list_item_1, schedules);
