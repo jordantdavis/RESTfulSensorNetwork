@@ -159,17 +159,41 @@ module.exports = {
 
     sampleUpload: function(request, response, next) {
         if (sensorDataModel.validateSampleUpload(request["body"])) {
+            var registrationId = request["body"]["registrationId"];
+            var samples = request["body"]["samples"];
 
+            async.waterfall([
+                function(callback) {
+                    deviceModel.isRegistered(registrationId, callback);
+                },
+                function(idExists, callback) {
+                    if (idExists) {
+                        sensorDataModel.insertUploadedSamples(registrationId, samples, callback);
+                    } else {
+                        next(new restify.BadRequestError("The supplied registration ID does not exist."));
+                    }
+                }
+            ], function(err) {
+                if (err) {
+                    next(new restify.InternalError("An error occurred on the server."));
+                } else {
+                    response.send({
+                        "code": "OK",
+                        "message": "Scheduling successful."
+                    });
+                    next();
+                }
+            });
         } else {
             next(new restify.BadRequestError("Invalid sensor data upload request body format."));
         }
     },
 
-    sampleDownload: function(request, response, next) {
-        if (sensorDataModel.validateSampleDownloadRequest(request["body"])) {
-            // valid request
-        } else {
-            next(new restify.BadRequestError("Invalid sensor data retrieval request body format."));
-        }
-    }
+    // sampleDownload: function(request, response, next) {
+    //     if (sensorDataModel.validateSampleDownloadRequest(request["body"])) {
+    //         // valid request
+    //     } else {
+    //         next(new restify.BadRequestError("Invalid sensor data retrieval request body format."));
+    //     }
+    // }
 };

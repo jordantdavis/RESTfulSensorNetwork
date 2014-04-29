@@ -91,4 +91,11 @@ public class SensorSamplesAccessor extends SQLiteOpenHelper {
         db.delete(TABLE_NAME, whereClause, whereArgs);
         db.close();
     }
+
+    public void removeAllSensorSamples() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_NAME, null, null);
+        db.close();
+    }
 }

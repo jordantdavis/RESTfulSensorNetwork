@@ -52,9 +52,13 @@ public class GcmMessageService extends IntentService {
                     double frequency = scheduleJson.getDouble("frequency");
 
                     Schedule schedule = new Schedule(sensorName, startTime, endTime, frequency);
-                    ScheduleAccessor scheduleAccessor = new ScheduleAccessor(this);
-                    scheduleAccessor.addSchedule(schedule);
-                    sendNotification("New RSN schedule received.");
+                    long curTime = System.currentTimeMillis() / 1000;
+
+                    if (curTime < schedule.getEndTime()) {
+                        ScheduleAccessor scheduleAccessor = new ScheduleAccessor(this);
+                        scheduleAccessor.addSchedule(schedule);
+                        sendNotification("New RSN schedule received.");
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

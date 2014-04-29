@@ -16,6 +16,7 @@ public class RsnLocationListener implements LocationListener {
     private int periodLength;
     private long nextSampleTime;
     private long endTime;
+    private SensorSamplesAccessor sensorSamplesAccessor;
 
     public RsnLocationListener(Context context, Schedule schedule, long startTime, long endTime) {
         locationManager = (LocationManager)(context.getSystemService(Context.LOCATION_SERVICE));
@@ -30,6 +31,7 @@ public class RsnLocationListener implements LocationListener {
 
         if (provider != null) {
             locationManager.requestLocationUpdates(provider, 0, 0, this);
+            sensorSamplesAccessor = new SensorSamplesAccessor(context);
         }
     }
 
@@ -38,6 +40,11 @@ public class RsnLocationListener implements LocationListener {
         long curTime = System.currentTimeMillis() / 1000;
         if (curTime > nextSampleTime) {
             nextSampleTime = curTime + periodLength;
+
+            sensorSamplesAccessor.addSensorSample(new SensorSample("locationLat", curTime,
+                    location.getLatitude()));
+            sensorSamplesAccessor.addSensorSample(new SensorSample("locationLng", curTime,
+                    location.getLongitude()));
         }
 
         if (curTime > endTime) {

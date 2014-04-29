@@ -24,6 +24,6 @@ CREATE TABLE SensorSamples (
     shortId INTEGER NOT NULL,
     sensorName VARCHAR(50) NOT NULL,
     timestamp INTEGER NOT NULL,
-    sampleValue INTEGER NOT NULL,
-    PRIMARY KEY(shortId, sensorName, timestamp);
+    sampleValue FLOAT NOT NULL,
+    PRIMARY KEY(shortId, sensorName, timestamp)
 );

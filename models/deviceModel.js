@@ -129,7 +129,7 @@ module.exports = {
             },
             // task 2 - insert registration ID into database
             function(connection, callback) {
-                var statement = "INSERT INTO Devices (registrationId, isOnline) VALUE (?, true);";
+                var statement = "INSERT INTO Devices (registrationId, isOnline) VALUES (?, true);";
                 connection.query(statement, [registrationId], function(err, rows) {
                     if (err) {
                         console.log(err);
@@ -242,9 +242,5 @@ module.exports = {
                 callback(null);
             }
         });
-    },
-
-    toogleIsOnline: function(registrationId) {
-
     }
 };

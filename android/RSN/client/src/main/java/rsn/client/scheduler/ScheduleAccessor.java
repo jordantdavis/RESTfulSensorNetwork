@@ -88,8 +88,8 @@ public class ScheduleAccessor extends SQLiteOpenHelper {
 
     public void removeSchedule(Schedule schedule) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String whereClause = COL_SENSOR_NAME + "=?," + COL_START_TIME + "=?" +
-                COL_END_TIME + "=?" + COL_FREQUENCY + "=?";
+        String whereClause = COL_SENSOR_NAME + "=? AND " + COL_START_TIME + "=? AND " +
+                COL_END_TIME + "=? AND " + COL_FREQUENCY + "=?;";
         String[] whereArgs = { schedule.getSensorName(), Long.toString(schedule.getStartTime()),
                 Long.toString(schedule.getEndTime()), Double.toString(schedule.getFrequency())};
 

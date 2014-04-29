@@ -23,7 +23,7 @@ module.exports = {
                                 "type": "string",
                                 "enum": [
                                     "accelerometerX", "accelerometerY", "accelerometerZ", "gyroscopeX",
-                                    "gyroscopeY", "gyroscopeZ", "humidity", "light", "location",
+                                    "gyroscopeY", "gyroscopeZ", "humidity", "light", "locationLat", "locationLng",
                                     "magnetometerX", "magnetometerY", "magnetometerZ", "pressure", "proximity",
                                     "temperature"
                                 ],
@@ -64,7 +64,7 @@ module.exports = {
                     "type": "string",
                     "enum": [
                         "accelerometerX", "accelerometerY", "accelerometerZ", "gyroscopeX",
-                        "gyroscopeY", "gyroscopeZ", "humidity", "light", "location",
+                        "gyroscopeY", "gyroscopeZ", "humidity", "light", "locationLat", "locationLng",
                         "magnetometerX", "magnetometerY", "magnetometerZ", "pressure", "proximity",
                         "temperature"
                     ],
@@ -98,5 +98,54 @@ module.exports = {
         }
 
         return true;
+    },
+
+    insertUploadedSamples: function(registrationId, samples, callback) {
+        async.waterfall([
+            // task 1 - open database connection
+            function(callback) {
+                db.openConnection(callback);
+            },
+            // task 2 - get short ID for specified registration ID from database
+            function(connection, callback) {
+                var statement = "SELECT shortId FROM Devices WHERE registrationId = ?;";
+                connection.query(statement, [registrationId], function(err, rows) {
+                    if (err) {
+                        db.closeConnection(connection);
+                        console.log(err);
+                        // pass the database error back to the main callback
+                        callback(err, null, null);
+                    } else {
+                        // pass the database connection and short ID to task 3
+                        callback(null, connection, rows[0]["shortId"]);
+                    }
+                });
+            },
+            function(connection, shortId, callback) {
+                var statement = "INSERT INTO SensorSamples VALUES ?;";
+                var valuesClause = [];
+
+                for (var i = 0; i < samples.length; i++) {
+                    valuesClause.push([shortId, samples[i]["sensorName"], samples[i]["timestamp"], samples[i]["sensorValue"]])
+                }
+
+                connection.query(statement, [valuesClause], function(err, rows) {
+                    db.closeConnection(connection);
+
+                    if (err) {
+                        console.log(err);
+                        callback(err);
+                    } else {
+                        callback(null);
+                    }
+                });
+            }
+        ], function(err) {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null);
+            }
+        });
     }
 }
