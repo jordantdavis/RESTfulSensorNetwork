@@ -158,7 +158,7 @@ module.exports = {
     },
 
     sampleUpload: function(request, response, next) {
-        if (sensorDataModel.validateSampleUpload(request["body"])) {
+        if (sensorDataModel.validateSampleUploadRequest(request["body"])) {
             var registrationId = request["body"]["registrationId"];
             var samples = request["body"]["samples"];
 
