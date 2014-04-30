@@ -46,10 +46,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import rsn.client.R;
+import rsn.client.util.RsnRequestHandler;
+import rsn.client.util.SettingsAccessor;
 
 public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabListener {
     private static final String SAVED_INST_HAS_BEEN_PROMPTED = "hasBeenPrompted";
-    private static final String PREFS_REGISTRATION_ID = "registrationId";
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String SENDER_ID = "928553698734";
@@ -60,6 +61,8 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
     private String registrationId = "";
     private GoogleCloudMessaging gcm;
     private Context context;
+    private SettingsAccessor settingsAccessor;
+    private RsnRequestHandler rsnRequestHandler;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -70,6 +73,8 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         setContentView(R.layout.activity_rsn_main);
 
         context = getApplicationContext();
+        settingsAccessor = new SettingsAccessor(this);
+        rsnRequestHandler = new RsnRequestHandler();
 
         // set up action bar
         final ActionBar actionBar = getSupportActionBar();
@@ -99,7 +104,7 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
 
         // check to see if the device has Google Play Services
         if (checkPlayServices()) {
-            registrationId = getGcmRegistrationId();
+            registrationId = settingsAccessor.getGcmRegistrationId();
 
             // find out if the user has been prompted to register with GCM/RSN
             if (savedInstanceState == null) {
@@ -198,22 +203,6 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         return true;
     }
 
-    private String getGcmRegistrationId() {
-        final SharedPreferences prefs = getGcmPreferences();
-        return prefs.getString(PREFS_REGISTRATION_ID, "");
-    }
-
-    private void setGcmRegistrationId(String registrationId) {
-        final SharedPreferences prefs = getGcmPreferences();
-        final SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PREFS_REGISTRATION_ID, registrationId);
-        editor.commit();
-    }
-
-    private SharedPreferences getGcmPreferences() {
-        return getSharedPreferences(RsnMainActivity.class.getSimpleName(), MODE_PRIVATE);
-    }
-
     // register with GCM and RSN in the background
     private void gcmRegisterInBackground() {
         new AsyncTask<Void, Void, Void>() {
@@ -226,9 +215,9 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
                     // GCM register
                     registrationId = gcm.register(SENDER_ID);
                     // RSN register
-                    registerDeviceOnServer(registrationId, getAvailableSensors());
+                    rsnRequestHandler.registerDevice(registrationId, settingsAccessor.getAllAvailableSensors());
                     // store registration ID in preferences
-                    setGcmRegistrationId(registrationId);
+                    settingsAccessor.setGcmRegistrationId(registrationId);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -255,10 +244,10 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
                     // GCM unregister
                     gcm.unregister();
                     // RSN unregister
-                    unregisterDeviceOnServer(registrationId);
+                    rsnRequestHandler.unregisterDevice(registrationId);
                     // erase registration ID from preferences
                     registrationId = "";
-                    setGcmRegistrationId(registrationId);
+                    settingsAccessor.setGcmRegistrationId(registrationId);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -270,108 +259,6 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
                 Toast.makeText(context, "GCM Unregistration Successful!", Toast.LENGTH_SHORT).show();
             }
         }.execute();
-    }
-
-    // register the device with RSN
-    private void registerDeviceOnServer(String registrationId, String[] availableSensors) {
-        String resource = "http://hnat-server.cs.memphis.edu:9263/device/register";
-        HttpClient client = new DefaultHttpClient();
-        HttpPost request = new HttpPost(resource);
-        HttpResponse response;
-        JSONObject obj = new JSONObject();
-        JSONArray arr = new JSONArray();
-        StringEntity strEntity = null;
-
-        try {
-            obj.put("registrationId", registrationId);
-
-            for (String sensor : availableSensors) {
-                arr.put(sensor);
-            }
-
-            obj.put("availableSensors", arr);
-            strEntity = new StringEntity(obj.toString());
-            strEntity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-            request.setEntity(strEntity);
-            response = client.execute(request);
-            // validate hnat-server response
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // unregister the device with RSN
-    private void unregisterDeviceOnServer(String registrationId) {
-        String resource = "http://hnat-server.cs.memphis.edu:9263/unregister";
-        HttpClient client = new DefaultHttpClient();
-        HttpPost request = new HttpPost(resource);
-        HttpResponse response;
-        JSONObject json = new JSONObject();
-        StringEntity strEntity = null;
-
-        try {
-            json.put("registrationId", registrationId);
-            strEntity = new StringEntity(json.toString());
-            strEntity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-            request.setEntity(strEntity);
-            response = client.execute(request);
-            // validate hnat-server response
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // get all sensors on the device
-    private String[] getAvailableSensors() {
-        Set<String> availableSensors = new HashSet<String>();
-        SensorManager sensorManager = (SensorManager)(getSystemService(Context.SENSOR_SERVICE));
-        LocationManager locationManager = (LocationManager)(getSystemService(Context.LOCATION_SERVICE));
-
-        for (Sensor sensor : sensorManager.getSensorList(Sensor.TYPE_ALL)) {
-            switch(sensor.getType()) {
-                case Sensor.TYPE_ACCELEROMETER:
-                    availableSensors.add("accelerometer");
-                    break;
-                case Sensor.TYPE_AMBIENT_TEMPERATURE:
-                    availableSensors.add("temperature");
-                    break;
-                case Sensor.TYPE_GYROSCOPE:
-                    availableSensors.add("gyroscope");
-                    break;
-                case Sensor.TYPE_LIGHT:
-                    availableSensors.add("light");
-                    break;
-                case Sensor.TYPE_MAGNETIC_FIELD:
-                    availableSensors.add("magnetometer");
-                    break;
-                case Sensor.TYPE_PRESSURE:
-                    availableSensors.add("pressure");
-                    break;
-                case Sensor.TYPE_PROXIMITY:
-                    availableSensors.add("proximity");
-                    break;
-                case Sensor.TYPE_RELATIVE_HUMIDITY:
-                    availableSensors.add("humidity");
-                    break;
-            }
-        }
-
-        for (String locationProvider : locationManager.getAllProviders()) {
-            if (locationProvider.equals(LocationManager.GPS_PROVIDER) || locationProvider.equals(LocationManager.NETWORK_PROVIDER)) {
-                availableSensors.add("location");
-                break;
-            }
-        }
-
-        return Arrays.copyOf(availableSensors.toArray(), availableSensors.size(), String[].class);
     }
 
     // adapter to map tabs to fragments

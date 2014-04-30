@@ -33,7 +33,7 @@ module.exports = {
                                 "type": "int",
                                 "required": true
                             },
-                            "sensorValue": {
+                            "sampleValue": {
                                 "type": "int",
                                 "required": true
                             }
@@ -122,11 +122,11 @@ module.exports = {
                 });
             },
             function(connection, shortId, callback) {
-                var statement = "INSERT INTO SensorSamples VALUES ?;";
+                var statement = "INSERT INTO SensorSamples (sensorName, timestamp, sampleValue) VALUES ?;";
                 var valuesClause = [];
 
                 for (var i = 0; i < samples.length; i++) {
-                    valuesClause.push([shortId, samples[i]["sensorName"], samples[i]["timestamp"], samples[i]["sensorValue"]])
+                    valuesClause.push([shortId, samples[i]["sensorName"], samples[i]["timestamp"], samples[i]["sampleValue"]])
                 }
 
                 connection.query(statement, [valuesClause], function(err, rows) {

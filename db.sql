@@ -21,9 +21,10 @@ CREATE TABLE Schedules (
 );
 
 CREATE TABLE SensorSamples (
+    id INTEGER NOT NULL AUTO_INCREMENT,
     shortId INTEGER NOT NULL,
     sensorName VARCHAR(50) NOT NULL,
     timestamp INTEGER NOT NULL,
     sampleValue FLOAT NOT NULL,
-    PRIMARY KEY(shortId, sensorName, timestamp)
+    PRIMARY KEY(id)
 );

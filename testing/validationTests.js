@@ -64,7 +64,7 @@ exports.sensorSampleUploadValidationTest = function(test) {
                 "sensorValue": 75
             }
         ]
-    }
+    };
 
     test.expect(1);
     test.equals(true, sensorDataModel.validateSampleUploadRequest(json));

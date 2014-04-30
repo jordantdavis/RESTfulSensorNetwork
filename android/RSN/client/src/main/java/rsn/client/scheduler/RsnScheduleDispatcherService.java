@@ -9,6 +9,10 @@ import android.util.Log;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import rsn.client.util.RsnRequestHandler;
+import rsn.client.util.SettingsAccessor;
 
 /**
  * Created by jordan on 4/23/14.
@@ -67,7 +71,18 @@ public class RsnScheduleDispatcherService extends IntentService {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null) {
-            Log.i("RSN", "Offloading sensor samples.");
+            Log.i("RSN", "Offloading now!");
+            SensorSamplesAccessor sensorSamplesAccessor = new SensorSamplesAccessor(this);
+            ArrayList<SensorSample> sensorSamplesList = sensorSamplesAccessor.getAllSensorSamples();
+            SensorSample[] sensorSamples = Arrays.copyOf(sensorSamplesList.toArray(),
+                    sensorSamplesList.size(), SensorSample[].class);
+            RsnRequestHandler rsnRequestHandler = new RsnRequestHandler();
+            SettingsAccessor settingsAccessor = new SettingsAccessor(this);
+            rsnRequestHandler.samplesUpload(settingsAccessor.getGcmRegistrationId(), sensorSamples);
+
+            for (SensorSample sensorSample : sensorSamplesList) {
+                sensorSamplesAccessor.removeSensorSample(sensorSample);
+            }
         }
     }
 }

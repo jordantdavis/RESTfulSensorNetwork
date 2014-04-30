@@ -83,19 +83,12 @@ public class SensorSamplesAccessor extends SQLiteOpenHelper {
 
     public void removeSensorSample(SensorSample sensorSample) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String whereClause = COL_SENSOR_NAME + "=?," + COL_TIMESTAMP + "=?" +
+        String whereClause = COL_SENSOR_NAME + "=? AND " + COL_TIMESTAMP + "=? AND " +
                 COL_SENSOR_VALUE + "=?";
         String[] whereArgs = { sensorSample.getSensorName(), Long.toString(sensorSample.getTimestamp()),
                 Double.toString(sensorSample.getSensorValue())};
 
         db.delete(TABLE_NAME, whereClause, whereArgs);
-        db.close();
-    }
-
-    public void removeAllSensorSamples() {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        db.delete(TABLE_NAME, null, null);
         db.close();
     }
 }
