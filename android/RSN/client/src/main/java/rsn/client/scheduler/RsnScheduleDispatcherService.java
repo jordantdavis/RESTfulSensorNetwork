@@ -74,14 +74,17 @@ public class RsnScheduleDispatcherService extends IntentService {
             Log.i("RSN", "Offloading now!");
             SensorSamplesAccessor sensorSamplesAccessor = new SensorSamplesAccessor(this);
             ArrayList<SensorSample> sensorSamplesList = sensorSamplesAccessor.getAllSensorSamples();
-            SensorSample[] sensorSamples = Arrays.copyOf(sensorSamplesList.toArray(),
-                    sensorSamplesList.size(), SensorSample[].class);
-            RsnRequestHandler rsnRequestHandler = new RsnRequestHandler();
-            SettingsAccessor settingsAccessor = new SettingsAccessor(this);
-            rsnRequestHandler.samplesUpload(settingsAccessor.getGcmRegistrationId(), sensorSamples);
 
-            for (SensorSample sensorSample : sensorSamplesList) {
-                sensorSamplesAccessor.removeSensorSample(sensorSample);
+            if (sensorSamplesList.size() > 0) {
+                SensorSample[] sensorSamples = Arrays.copyOf(sensorSamplesList.toArray(),
+                        sensorSamplesList.size(), SensorSample[].class);
+                RsnRequestHandler rsnRequestHandler = new RsnRequestHandler();
+                SettingsAccessor settingsAccessor = new SettingsAccessor(this);
+                rsnRequestHandler.samplesUpload(settingsAccessor.getGcmRegistrationId(), sensorSamples);
+
+                for (SensorSample sensorSample : sensorSamplesList) {
+                    sensorSamplesAccessor.removeSensorSample(sensorSample);
+                }
             }
         }
     }

@@ -122,7 +122,7 @@ module.exports = {
                 });
             },
             function(connection, shortId, callback) {
-                var statement = "INSERT INTO SensorSamples (sensorName, timestamp, sampleValue) VALUES ?;";
+                var statement = "INSERT INTO SensorSamples (shortId, sensorName, timestamp, sampleValue) VALUES ?;";
                 var valuesClause = [];
 
                 for (var i = 0; i < samples.length; i++) {
