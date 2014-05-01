@@ -57,24 +57,27 @@ public class ScheduleAccessor extends SQLiteOpenHelper {
 
         ArrayList<Schedule> schedules = new ArrayList<Schedule>();
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            String sensorName = cursor.getString(0);
-            long startTime = cursor.getLong(1);
-            long endTime = cursor.getLong(2);
-            double frequency = cursor.getDouble(3);
-            schedules.add(new Schedule(sensorName, startTime, endTime, frequency));
-            cursor.moveToNext();
+        if (cursor != null) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                String sensorName = cursor.getString(0);
+                long startTime = cursor.getLong(1);
+                long endTime = cursor.getLong(2);
+                double frequency = cursor.getDouble(3);
+                schedules.add(new Schedule(sensorName, startTime, endTime, frequency));
+                cursor.moveToNext();
+            }
+
+            cursor.close();
         }
 
-        cursor.close();
         db.close();
 
         return schedules;
     }
 
     public void addSchedule(Schedule schedule) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_SENSOR_NAME, schedule.getSensorName());
@@ -88,12 +91,14 @@ public class ScheduleAccessor extends SQLiteOpenHelper {
 
     public void removeSchedule(Schedule schedule) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String whereClause = COL_SENSOR_NAME + "=? AND " + COL_START_TIME + "=? AND " +
-                COL_END_TIME + "=? AND " + COL_FREQUENCY + "=?;";
-        String[] whereArgs = { schedule.getSensorName(), Long.toString(schedule.getStartTime()),
-                Long.toString(schedule.getEndTime()), Double.toString(schedule.getFrequency())};
 
-        db.delete(TABLE_NAME, whereClause, whereArgs);
+        db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE " + COL_SENSOR_NAME + "='" +
+                schedule.getSensorName() + "' AND " + COL_START_TIME + "=" +
+                schedule.getStartTime() + " AND " + COL_END_TIME + "=" +
+                schedule.getEndTime() + " AND " + COL_FREQUENCY + "=" +
+                schedule.getFrequency() + ";");
+
+
         db.close();
     }
 }

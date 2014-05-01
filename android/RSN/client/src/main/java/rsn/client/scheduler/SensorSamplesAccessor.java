@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -26,14 +27,12 @@ public class SensorSamplesAccessor extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String tableCreateString =
-                "CREATE TABLE " + TABLE_NAME + " (" +
-                        COL_SENSOR_NAME + " VARCHAR(50)," +
-                        COL_TIMESTAMP+ " INT," +
-                        COL_SENSOR_VALUE + " REAL," +
-                        "PRIMARY KEY (" +
-                        COL_SENSOR_NAME + "," +
-                        COL_TIMESTAMP + "," +
-                        COL_SENSOR_VALUE + "));";
+            "CREATE TABLE " + TABLE_NAME + " (" +
+            "id INT AUTO INCREMENT," +
+            COL_SENSOR_NAME + " VARCHAR(50)," +
+            COL_TIMESTAMP+ " INT," +
+            COL_SENSOR_VALUE + " REAL," +
+            "PRIMARY KEY (id));";
 
         db.execSQL(tableCreateString);
     }
@@ -44,7 +43,7 @@ public class SensorSamplesAccessor extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public ArrayList<SensorSample> getAllSensorSamples() {
+    public ArrayList<SensorSample> getAllSensorSamplesAndClear() {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_NAME,
@@ -54,23 +53,28 @@ public class SensorSamplesAccessor extends SQLiteOpenHelper {
 
         ArrayList<SensorSample> sensorSamples = new ArrayList<SensorSample>();
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            String sensorName = cursor.getString(0);
-            long timestamp = cursor.getLong(1);
-            double sensorValue = cursor.getDouble(2);
-            sensorSamples.add(new SensorSample(sensorName, timestamp, sensorValue));
-            cursor.moveToNext();
+        if (cursor != null) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                String sensorName = cursor.getString(0);
+                long timestamp = cursor.getLong(1);
+                double sensorValue = cursor.getDouble(2);
+                sensorSamples.add(new SensorSample(sensorName, timestamp, sensorValue));
+                cursor.moveToNext();
+            }
+
+            cursor.close();
         }
 
-        cursor.close();
+        removeAllSensorSamples();
+
         db.close();
 
         return sensorSamples;
     }
 
     public void addSensorSample(SensorSample sensorSample) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_SENSOR_NAME, sensorSample.getSensorName());
@@ -83,12 +87,18 @@ public class SensorSamplesAccessor extends SQLiteOpenHelper {
 
     public void removeSensorSample(SensorSample sensorSample) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String whereClause = COL_SENSOR_NAME + "=? AND " + COL_TIMESTAMP + "=? AND " +
-                COL_SENSOR_VALUE + "=?";
-        String[] whereArgs = { sensorSample.getSensorName(), Long.toString(sensorSample.getTimestamp()),
-                Double.toString(sensorSample.getSensorValue())};
 
-        db.delete(TABLE_NAME, whereClause, whereArgs);
+        db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE " + COL_SENSOR_NAME + "='" +
+                sensorSample.getSensorName() + "' AND " + COL_TIMESTAMP + "=" +
+                sensorSample.getTimestamp() + " AND " + COL_SENSOR_VALUE + "=" +
+                sensorSample.getSensorValue() + ";");
+
+        db.close();
+    }
+
+    public void removeAllSensorSamples() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
         db.close();
     }
 }

@@ -279,9 +279,9 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
                     fragment = new SchedulerFragment();
                     break;
                 case 1:
-                    fragment = new VisualizerFragment();
-                    break;
-                case 2:
+//                    fragment = new VisualizerFragment();
+//                    break;
+//                case 2:
                     fragment = new LoggerFragment();
                     break;
             }
@@ -292,7 +292,8 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+//            return 3;
+            return 2;
         }
 
         @Override
@@ -302,8 +303,8 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
                 case 0:
                     return getString(R.string.title_scheduler).toUpperCase(l);
                 case 1:
-                    return getString(R.string.title_visualizer).toUpperCase(l);
-                case 2:
+//                    return getString(R.string.title_visualizer).toUpperCase(l);
+//                case 2:
                     return getString(R.string.title_logger).toUpperCase(l);
             }
             return null;

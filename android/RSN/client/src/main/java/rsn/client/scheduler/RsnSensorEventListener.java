@@ -11,8 +11,8 @@ import android.hardware.SensorManager;
  */
 public class RsnSensorEventListener implements SensorEventListener {
     private SensorManager sensorManager;
-    private int periodLength;
-    private long nextSampleTime;
+    private double periodLength;
+    private double nextSampleTime;
     private long endTime;
     private int numAxes;
     private String sensorName;
@@ -40,12 +40,12 @@ public class RsnSensorEventListener implements SensorEventListener {
         } else if (sensorName.equals("pressure")) {
             sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
         } else if (sensorName.equals("proximity")) {
-            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         } else if (sensorName.equals("humidity")) {
             sensor = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
         }
 
-        periodLength = (int)(1.0 / schedule.getFrequency());
+        periodLength = 1.0 / schedule.getFrequency();
         nextSampleTime = startTime;
         this.endTime = endTime;
 
@@ -58,22 +58,23 @@ public class RsnSensorEventListener implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         long curTime = System.currentTimeMillis() / 1000;
-        if (curTime > nextSampleTime) {
-            nextSampleTime = curTime + periodLength;
+        if (event != null) {
+            if (curTime > nextSampleTime) {
+                nextSampleTime = curTime + periodLength;
 
-            if (numAxes == 1) {
-                sensorSamplesAccessor.addSensorSample(new SensorSample(sensorName, curTime,
-                        event.values[0]));
-            } else if (numAxes == 3) {
-                sensorSamplesAccessor.addSensorSample(new SensorSample(sensorName + "X", curTime,
-                        event.values[0]));
-                sensorSamplesAccessor.addSensorSample(new SensorSample(sensorName + "Y", curTime,
-                        event.values[1]));
-                sensorSamplesAccessor.addSensorSample(new SensorSample(sensorName + "Z", curTime,
-                        event.values[2]));
+                if (numAxes == 1) {
+                    sensorSamplesAccessor.addSensorSample(new SensorSample(sensorName, curTime,
+                            event.values[0]));
+                } else if (numAxes == 3) {
+                    sensorSamplesAccessor.addSensorSample(new SensorSample(sensorName + "X", curTime,
+                            event.values[0]));
+                    sensorSamplesAccessor.addSensorSample(new SensorSample(sensorName + "Y", curTime,
+                            event.values[1]));
+                    sensorSamplesAccessor.addSensorSample(new SensorSample(sensorName + "Z", curTime,
+                            event.values[2]));
+                }
             }
         }
-
         if (curTime > endTime) {
             sensorManager.unregisterListener(this);
         }
