@@ -201,7 +201,7 @@ module.exports = {
                     "SensorSamples WHERE sensorName IN ? AND timestamp BETWEEN ? AND ?";
                 if (shortIds) {
                     statement += " AND shortId IN ? ORDER BY timestamp;";
-                    connection.query(statement, [sensorNames], [startTime], [endTime], [shortIds], function(err, rows) {
+                    connection.query(statement, [sensorNames, startTime, endTime, shortIds], function(err, rows) {
                         db.closeConnection(connection);
 
                         if (err) {
@@ -213,7 +213,7 @@ module.exports = {
                     });
                 } else {
                     statement += " ORDER BY timestamp;";
-                    connection.query(statement, [sensorNames], [startTime], [endTime], function(err, rows) {
+                    connection.query(statement, [sensorNames, startTime, endTime], function(err, rows) {
                         db.closeConnection(connection);
 
                         if (err) {
