@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:summary="User setting information"
+        android:title="Online Status" >
+
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:summary="On/Off"
+            android:title="Toggle online status" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:summary="User setting information"
+        android:title="Active sensors" >
+
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:title="Accelerometer" />
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:title="Temperature" />
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:title="Gyroscope" />
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:title="Light" />
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:title="Magnetometer" />
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:title="Pressure" />
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:title="Proximity" />
+        <CheckBoxPreference
+            android:key="checkBox"
+            android:title="Humidity" />
+
+    </PreferenceCategory>
+
+
+    </PreferenceScreen>
