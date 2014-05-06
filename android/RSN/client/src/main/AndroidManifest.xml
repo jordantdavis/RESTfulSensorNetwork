@@ -32,6 +32,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".settings.RsnPreferenceActivity"
+            android:theme="@android:style/Theme.Light" >
+        </activity>
 
         <receiver
             android:name=".gcm.GcmMessageBroadcastReceiver"
