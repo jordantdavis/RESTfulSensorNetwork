@@ -189,11 +189,31 @@ module.exports = {
         }
     },
 
-    // sampleDownload: function(request, response, next) {
-    //     if (sensorDataModel.validateSampleDownloadRequest(request["body"])) {
-    //         // valid request
-    //     } else {
-    //         next(new restify.BadRequestError("Invalid sensor data retrieval request body format."));
-    //     }
-    // }
+    sampleDownload: function(request, response, next) {
+        if (sensorDataModel.validateSampleDownloadRequest(request["body"])) {
+            var sensorNames = request["body"]["sensorNames"];
+            var startTime = request["body"]["startTime"];
+            var endTime = request["body"]["endTime"];
+            var shortIds = request["body"]["shortIds"];
+
+            async.waterfall([
+                function(callback) {
+                    sensorDataModel.getSamples(sensorNames, startTime, endTime, shortIds, callback);
+                }
+            ], function(err, numSamples, samples) {
+                if (err) {
+                    next(new restify.InternalError("An error occurred on the server."));
+                } else {
+                    response.send({
+                        "code": "OK",
+                        "message": numSamples + " samples downloaded.",
+                        "samples": samples
+                    });
+                    next();
+                }
+            });
+        } else {
+            next(new restify.BadRequestError("Invalid sensor data retrieval request body format."));
+        }
+    }
 };

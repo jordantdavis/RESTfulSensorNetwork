@@ -56,12 +56,12 @@ exports.sensorSampleUploadValidationTest = function(test) {
             {
                 "sensorName": "accelerometerZ",
                 "timestamp": 1396454692,
-                "sensorValue": -1.0
+                "sampleValue": -1.0
             },
             {
                 "sensorName": "temperature",
                 "timestamp": 1396454692,
-                "sensorValue": 75
+                "sampleValue": 75
             }
         ]
     };
@@ -73,7 +73,7 @@ exports.sensorSampleUploadValidationTest = function(test) {
 
 exports.sensorSampleDownloadValidationTest = function(test) {
     var json = {
-        "sensorName": "magnetometerX",
+        "sensorNames": ["magnetometerX"],
         "startTime": 1396454392,
         "endTime": 1396454692,
         "shortIds": ["0", "1", "2"]

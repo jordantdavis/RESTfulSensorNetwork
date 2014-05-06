@@ -11,6 +11,7 @@ server.post("/device/register", handlers.deviceRegister);
 server.post("/device/unregister", handlers.deviceUnregister);
 server.post("/schedule/create", handlers.scheduleCreate);
 server.post("/samples/upload", handlers.sampleUpload);
+server.post("/samples/download", handlers.sampleDownload);
 
 server.listen(9263, function() {
     console.log("Server started on port 9263.");

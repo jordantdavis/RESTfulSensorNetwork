@@ -7,7 +7,45 @@ var db = require("./dbConfig.js");
 
 module.exports = {
     validateSampleUploadRequest: function(json) {
-        var schema = {
+          var schema = {
+            "type": "object",
+            "properties": {
+                "registrationId": {
+                    "type": "string",
+                    "required": true
+                },
+                "samples": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "sensorName": {
+                                "type": "string",
+                                "enum": [
+                                    "accelerometerX", "accelerometerY", "accelerometerZ", "gyroscopeX",
+                                    "gyroscopeY", "gyroscopeZ", "humidity", "light", "locationLat", "locationLng",
+                                    "magnetometerX", "magnetometerY", "magnetometerZ", "pressure", "proximity",
+                                    "temperature"
+                                ],
+                                "required": true
+                            },
+                            "timestamp": {
+                                "type": "number",
+                                "required": true
+                            },
+                            "sampleValue": {
+                                "type": "number",
+                                "required": true
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            },
+            "additionalProperties": false
+        };
+
+         var schema = {
             "type": "object",
             "properties": {
                 "registrationId": {
@@ -60,14 +98,18 @@ module.exports = {
         var schema = {
             "type": "object",
             "properties": {
-                "sensorName": {
-                    "type": "string",
-                    "enum": [
-                        "accelerometerX", "accelerometerY", "accelerometerZ", "gyroscopeX",
-                        "gyroscopeY", "gyroscopeZ", "humidity", "light", "locationLat", "locationLng",
-                        "magnetometerX", "magnetometerY", "magnetometerZ", "pressure", "proximity",
-                        "temperature"
-                    ],
+                "sensorNames": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "accelerometerX", "accelerometerY", "accelerometerZ", "gyroscopeX",
+                            "gyroscopeY", "gyroscopeZ", "humidity", "light", "locationLat", "locationLng",
+                            "magnetometerX", "magnetometerY", "magnetometerZ", "pressure", "proximity",
+                            "temperature"
+                        ]
+                    },
                     "required": true
                 },
                 "startTime": {
@@ -145,6 +187,49 @@ module.exports = {
                 callback(err);
             } else {
                 callback(null);
+            }
+        });
+    },
+
+    getSamples: function(sensorNames, startTime, endTime, shortIds, callback) {
+        async.waterfall([
+            function(callback) {
+                db.openConnection(callback);
+            },
+            function(connection, callback) {
+                var statement = "SELECT DISTINCT shortId, sensorName, timestamp, sampleValue FROM " +
+                    "SensorSamples WHERE sensorName IN ? AND timestamp BETWEEN ? AND ?";
+                if (shortIds) {
+                    statement += "  AND shortId IN ? ORDER BY timestamp;";
+                    connection.query(statement, [sensorNames], startTime, endTime, [shortIds], function(err, rows) {
+                        db.closeConnection(connection);
+
+                        if (err) {
+                            console.log(err);
+                            callback(err, null, null);
+                        } else {
+                            callback(null, rows.length, rows);
+                        }
+                    });
+                } else {
+                    statement += " ORDER BY timestamp;";
+                    connection.query(statement, [sensorNames], startTime, endTime, function(err, rows) {
+                        db.closeConnection(connection);
+
+                        if (err) {
+                            console.log(err);
+                            callback(err, null, null);
+                        } else {
+                            callback(null, rows.length, rows);
+                        }
+                    });
+                }
+            }
+        ], function(err, numSamples, samples) {
+            if (err) {
+                callback(err, null, null);
+            } else {
+                callback(null, numSamples, samples);
             }
         });
     }
