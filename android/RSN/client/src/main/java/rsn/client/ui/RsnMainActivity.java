@@ -46,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import rsn.client.R;
+import rsn.client.settings.RsnPreferenceActivity;
 import rsn.client.util.RsnRequestHandler;
 import rsn.client.util.SettingsAccessor;
 
@@ -140,6 +141,9 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.rsn_main, menu);
+        Intent prefsIntent = new Intent(this.getApplicationContext(),RsnPreferenceActivity.class);
+        MenuItem preferences = menu.findItem(R.id.action_settings);
+        preferences.setIntent(prefsIntent);
         return true;
     }
 
@@ -150,7 +154,7 @@ public class RsnMainActivity extends ActionBarActivity implements ActionBar.TabL
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            return true;
+            this.startService(item.getIntent());
         }
         return super.onOptionsItemSelected(item);
     }
