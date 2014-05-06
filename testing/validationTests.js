@@ -73,10 +73,9 @@ exports.sensorSampleUploadValidationTest = function(test) {
 
 exports.sensorSampleDownloadValidationTest = function(test) {
     var json = {
-        "sensorNames": ["magnetometerX"],
-        "startTime": 1396454392,
-        "endTime": 1396454692,
-        "shortIds": ["0", "1", "2"]
+        "sensorNames": ["locationLat", "locationLng"],
+        "startTime": 1399309200,
+        "endTime": 1399309260
     };
 
     test.expect(1);
