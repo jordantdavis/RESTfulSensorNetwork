@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>RSN</title>
+        <meta charset="utf-8">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet">
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="jumbotron text-center">
+                <h1>Visualize Data</h1>
+            </div>
+
+            <div id="schedules">
+                <div class="well schedule">
+                <form id="form">
+                    <div id="sensors"><b>Sensor(s)</b>
+                    <select class="form-control sensor-name" name="sensorNames">
+                        <option value="accelerometerX">Accelerometer X</option>
+                        <option value="accelerometerY">Accelerometer Y</option>
+                        <option value="accelerometerZ">Accelerometer Z</option>
+                        <option value="temperature">Temperature</option>
+                        <option value="gyroscopeX">Gyroscope X</option>
+                        <option value="gyroscopeY">Gyroscope Y</option>
+                        <option value="gyroscopeZ">Gyroscope Z</option>
+                        <option value="light">Light</option>
+                        <option value="magnetometerX">Magnetometer X</option>
+                        <option value="magnetometerY">Magnetometer Y</option>
+                        <option value="locationLat">Latitude</option>
+                        <option value="locationLng">Longitude</option>
+                        <option value="pressure">Pressure</option>
+                        <option value="proximity">Proximity</option>
+                        <option value="humidity">Humidity</option>
+                    </select>
+                    </div>
+
+                    <label>Start Time</label>
+                    <input type="text" class="form-control start-time" name="startTime">
+
+                    <label>End Time</label>
+                    <input type="text" class="form-control end-time" name="endTime">
+
+                    <label>Device IDs (Leave blank for all)</label>
+                    <input type="text" class="form-control frequency" name="shortIds">
+                </form>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="button" class="btn btn-success btn-sm" id="add-schedule">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            </div>
+
+            <br>
+
+            <div class="well">
+                <div id="results"></div>
+            </div>
+
+            <br>
+
+            <div class="well text-center">
+                <button type="button" class="btn btn-lg btn-primary" id="send-button">Send</button>
+                <button type="button" class="btn btn-lg btn-danger" id="clear-button">Clear</button>
+            </div>
+            
+            <div id="graphArea"></div>
+        </div>
+        
+
+        <script>
+           // $("#add-schedule").on("click", function() {
+               // var temp = $(".sensor-name").first().clone();
+               // temp = temp.appendTo("#sensors");
+               // temp.append('<button type="button" class="btn btn-danger btn-sm remove-schedule"><span class="glyphicon glyphicon-remove"></span></button>');
+           // });
+
+            $("#schedules").on("click", ".remove-schedule", function() {
+                $(this).parent().parent().remove();
+            });
+
+            $.fn.serializeObject = function()
+        	{
+        	    var o = {};
+        	    var a = this.serializeArray();
+        	    $.each(a, function() {
+        	        if (o[this.name] !== undefined) {
+        	            if (!o[this.name].push) {
+        	                o[this.name] = [o[this.name]];
+        	            }
+        	            o[this.name].push(this.value || '');
+        	        } else {
+        	            o[this.name] = this.value || '';
+        	        }
+        	    });
+        	    return o;
+        	};
+        	
+            $("#send-button").on("click", function() {
+
+            	var sensorNameElems = $(".sensor-name option:selected");
+                var startTimeElems = $(".start-time");
+                var endTimeElems = $(".end-time");
+                var frequencyElems = $(".frequency");
+                var schedulesArray = [];
+                var otherArray = [];
+
+                for (var i = 0; i < sensorNameElems.length; i++) {
+                    schedulesArray.push(sensorNameElems.eq(i).val());
+                }
+                
+                for (var i = 0; i < frequencyElems.length; i++) {
+                    otherArray.push(frequencyElems.eq(i).val());
+                }
+
+                
+                
+                
+
+                var dataSample =   JSON.stringify({ "sensorNames": schedulesArray, 
+                									"startTime": parseInt(startTimeElems.val()),
+                									"endTime": parseInt(endTimeElems.val()),
+                									"shortIds": otherArray
+                								  });
+                //$("#results").text(dataSample);
+                //return false;
+            
+                
+                $.ajax({
+                    url: "http://hnat-server.cs.memphis.edu:9263/samples/download",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: dataSample,
+                    success: function(data) {
+                    	$("#results").html(data["message"]);
+                      
+                        $.ajax({
+                        	url: "http://hnat-server.cs.memphis.edu:9085/",
+                        	type: "POST",
+							//contentType: "application/json",
+                        	data: data,
+                        	success: function(data) {
+                        		$("#graphArea").html(data);
+                        	},
+                        	error: function(xhr) {
+                        		$("#graphArea").html("<p>Yea....this doesn't work<p>");
+                        	}
+                        });
+                    },
+                    error: function(xhr) {
+                        $("#results").html($.parseJSON(xhr.responseText)["message"]);
+                    }
+                });
+                
+            });
+
+            $("#clear-button").on("click", function() {
+                $("#results").html("");
+            });
+        </script>
+    </body>
+</html>
+
